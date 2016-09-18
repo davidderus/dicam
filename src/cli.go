@@ -29,10 +29,41 @@ func main()  {
           },
         },
         {
+          Name: "stop",
+          Usage: "Stops a camera",
+          Action: func(c *cli.Context) error {
+            fmt.Println("Stopping cam", c.Args().First())
+            return nil
+          },
+        },
+        {
           Name: "list",
           Usage: "Lists all available cameras",
           Action: func(c *cli.Context) error {
             fmt.Println(strings.Join(cams, "\n"))
+            return nil
+          },
+        },
+      },
+    },
+    {
+      Name: "server",
+      Aliases: []string{"s"},
+      Usage: "Manages the webserver",
+      Subcommands: []cli.Command{
+        {
+          Name: "start",
+          Usage: "Starts the webserver",
+          Action: func(c *cli.Context) error {
+            fmt.Println("Starting webserver")
+            return nil
+          },
+        },
+        {
+          Name: "stop",
+          Usage: "Stops the webserver",
+          Action: func(c *cli.Context) error {
+            fmt.Println("Stopping webserver")
             return nil
           },
         },
