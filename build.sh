@@ -14,4 +14,5 @@ build() {
   ls -lah build/*
 }
 
-build $1
+cd src/
+build *.go
