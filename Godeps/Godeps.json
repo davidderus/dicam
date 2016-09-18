@@ -1,0 +1,6 @@
+{
+	"ImportPath": "github.com/davidderus/dicam",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
+	"Deps": []
+}
