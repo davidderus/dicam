@@ -13,6 +13,7 @@ func main()  {
   app := cli.NewApp()
   app.Name = "dicam-cli"
   app.Usage = "Controls dicam processes and cams"
+  app.Version = "0.0.1"
 
   app.Commands = []cli.Command{
     {
