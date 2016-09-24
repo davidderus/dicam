@@ -84,12 +84,3 @@ func (c camera) teardown() {
 
 	return
 }
-
-func main() {
-	cam := camera{id: 1}
-
-	cam.setup()
-
-	fmt.Printf("Starting cam %d", cam.id)
-	cam.start()
-}
