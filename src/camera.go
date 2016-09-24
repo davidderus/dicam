@@ -73,7 +73,11 @@ func (c *camera) start() {
 }
 
 func (c *camera) stop() {
-	c.command.Process.Kill()
+	if !c.command.ProcessState.Exited() {
+		// todo: Use something less agressive than killing
+		c.command.Process.Kill()
+	}
+
 	c.running = false
 
 	return
