@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+build() {
+  for f in "$@"
+  do
+    binary_name=$(basename "$f")
+    binary_name=${binary_name%.*}
+
+    echo "= Building $binary_name"
+
+    go build -o "build/dicam-$binary_name" -ldflags "-s" $f
+  done
+
+  printf "= Built done!\n\n"
+  ls -lah build/*
+}
+
+build src/*.go
