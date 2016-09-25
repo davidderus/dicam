@@ -9,12 +9,21 @@ type controller struct {
 func (c *controller) launchCamera(cameraID int) camera {
 	cam := camera{id: cameraID}
 
-	cam.setup()
+	setupError := cam.setup()
 
-	log.Printf("Starting cam %d\n", cam.id)
-	cam.start()
+	if setupError != nil {
+		log.Fatalln("Error during camera setup:", setupError)
+	} else {
+		log.Printf("Starting cam %d\n", cam.id)
+	}
 
-	log.Printf("Camera started with PID %d\n", cam.pid)
+	startError := cam.start()
+
+	if startError != nil {
+		log.Fatalln("Error during camera launch:", startError)
+	} else {
+		log.Printf("Camera started with PID %d\n", cam.pid)
+	}
 
 	c.cameras = append(c.cameras, cam)
 
@@ -32,7 +41,9 @@ func (c controller) getCameraByID(cameraID int) *camera {
 		}
 	}
 
-	panic("No camera found")
+	log.Fatalln("No camera found")
+
+	return nil
 }
 
 func (c controller) stopCamera(cameraID int) {
@@ -41,9 +52,13 @@ func (c controller) stopCamera(cameraID int) {
 	cam := c.getCameraByID(cameraID)
 	pid := cam.pid
 
-	cam.stop()
+	err := cam.stop()
 
-	log.Printf("Camera stopped via PID %d\n", pid)
+	if err != nil {
+		log.Fatalln("Error while stopping camera:", err)
+	} else {
+		log.Printf("Camera stopped via PID %d\n", pid)
+	}
 }
 
 func main() {

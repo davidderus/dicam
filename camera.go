@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -32,16 +33,16 @@ const ThreadBaseName = "dicam-thread-%d"
 // DefaultConfigMode is the file mode for a config file
 const DefaultConfigMode = 0644
 
-func (c *camera) setup() {
+func (c *camera) setup() error {
 	if c.id == 0 {
-		panic("No id set for camera")
+		return errors.New("No id set for camera")
 	}
 
 	mainConfigPath := path.Join(ConfigDirectory, MainConfigFile)
 	defaultConfig, readError := ioutil.ReadFile(mainConfigPath)
 
 	if readError != nil {
-		panic(readError)
+		return errors.New("Can not read main config file")
 	}
 
 	threadName := fmt.Sprintf(ThreadBaseName, c.id)
@@ -53,29 +54,35 @@ func (c *camera) setup() {
 	writeError := ioutil.WriteFile(c.configFile, configBytes, DefaultConfigMode)
 
 	if writeError != nil {
-		panic(writeError)
+		return writeError
 	}
+
+	return nil
 }
 
-func (c *camera) start() {
+func (c *camera) start() error {
 	command := exec.Command("motion", "-c", c.configFile, "-l", c.logFile)
 	err := command.Start()
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	c.pid = command.Process.Pid
+
+	return nil
 }
 
-func (c *camera) stop() {
+func (c *camera) stop() error {
 	err := syscall.Kill(c.pid, syscall.SIGTERM)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	c.pid = 0
+
+	return nil
 }
 
 func (c camera) isRunning() bool {
