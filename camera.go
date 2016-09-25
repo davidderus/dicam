@@ -54,8 +54,6 @@ func (c *camera) setup() {
 	if writeError != nil {
 		panic(writeError)
 	}
-
-	return
 }
 
 func (c *camera) start() {
@@ -68,8 +66,6 @@ func (c *camera) start() {
 
 	c.command = command
 	c.running = true
-
-	return
 }
 
 func (c *camera) stop() {
@@ -79,12 +75,8 @@ func (c *camera) stop() {
 	}
 
 	c.running = false
-
-	return
 }
 
 func (c camera) teardown() {
 	os.Remove(c.configFile)
-
-	return
 }
