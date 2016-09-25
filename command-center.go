@@ -13,6 +13,12 @@ import (
 const responseErrorCode = "ERROR"
 const responseSuccessCode = "SUCCESS"
 
+const invalidCommandError = "Invalid command"
+
+const startAction = "START"
+const stopAction = "STOP"
+const listAction = "LIST"
+
 type CommandCenter struct {
 	host string
 	port int
@@ -85,15 +91,43 @@ type ServerCommand struct{ Command }
 type InvalidCommand struct{ Command }
 
 func (com CamCommand) run() (string, error) {
-	return "Using cam", nil
+	action := com.params[0]
+
+	var id string
+
+	if len(com.params) > 1 {
+		id = com.params[1]
+	} else {
+		id = ""
+	}
+
+	switch action {
+	case startAction:
+		return fmt.Sprintf("Starting cam %s", id), nil
+	case stopAction:
+		return fmt.Sprintf("Stopping cam %s", id), nil
+	case listAction:
+		return "Listing all cams", nil
+	}
+
+	return "", errors.New(invalidCommandError)
 }
 
 func (com ServerCommand) run() (string, error) {
-	return "Using server", nil
+	action := com.params[0]
+
+	switch action {
+	case startAction:
+		return "Starting webserver", nil
+	case stopAction:
+		return "Stopping webserver", nil
+	}
+
+	return "", errors.New(invalidCommandError)
 }
 
 func (com InvalidCommand) run() (string, error) {
-	return "", errors.New("Invalid command")
+	return "", errors.New(invalidCommandError)
 }
 
 func commandRunner(command CommandInterface) (string, error) {
