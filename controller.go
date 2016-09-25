@@ -3,8 +3,8 @@ package main
 import "log"
 
 type controller struct {
-	cameras []camera
-	server  commandServer
+	cameras       []camera
+	commandCenter CommandCenter
 }
 
 func (c *controller) launchCamera(cameraID int) camera {
@@ -63,15 +63,15 @@ func (c controller) stopCamera(cameraID int) {
 }
 
 func (c *controller) startServer() {
-	server := commandServer{port: 8888}
-	server.start()
+	cc := CommandCenter{port: 8888}
+	cc.start()
 
-	c.server = server
+	c.commandCenter = cc
 }
 
 func main() {
 	mainController := controller{}
 
-	log.Println("Starting command server")
+	log.Println("Starting command center")
 	mainController.startServer()
 }

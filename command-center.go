@@ -13,7 +13,7 @@ import (
 const responseErrorCode = "ERROR"
 const responseSuccessCode = "SUCCESS"
 
-type commandServer struct {
+type CommandCenter struct {
 	host string
 	port int
 }
@@ -25,7 +25,7 @@ func sendResponse(connection net.Conn, responseType string, responseMessage stri
 	connection.Close()
 }
 
-func (cs *commandServer) start() error {
+func (cs *CommandCenter) start() error {
 	service := fmt.Sprintf("%s:%d", cs.host, cs.port)
 	tcpAddress, resolveError := net.ResolveTCPAddr("tcp4", service)
 	if resolveError != nil {
