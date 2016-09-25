@@ -6,11 +6,12 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"syscall"
 )
 
 type camera struct {
-	command    *exec.Cmd
 	id         int
+	pid        int
 	configFile string
 	logFile    string
 	running    bool
@@ -64,17 +65,21 @@ func (c *camera) start() {
 		panic(err)
 	}
 
-	c.command = command
-	c.running = true
+	c.pid = command.Process.Pid
 }
 
 func (c *camera) stop() {
-	if !c.command.ProcessState.Exited() {
-		// todo: Use something less agressive than killing
-		c.command.Process.Kill()
+	err := syscall.Kill(c.pid, syscall.SIGTERM)
+
+	if err != nil {
+		panic(err)
 	}
 
-	c.running = false
+	c.pid = 0
+}
+
+func (c camera) isRunning() bool {
+	return c.pid > 0
 }
 
 func (c camera) teardown() {
