@@ -65,6 +65,36 @@ func handleCommand(connection net.Conn) {
 	connection.Close()
 }
 
+// Command Handling
+
+type CommandInterface interface {
+	run() (string, error)
+}
+
+type Command struct{ params []string }
+
+type CamCommand struct{ Command }
+
+type ServerCommand struct{ Command }
+
+type InvalidCommand struct{ Command }
+
+func (com CamCommand) run() (string, error) {
+	return "Using cam", nil
+}
+
+func (com ServerCommand) run() (string, error) {
+	return "Using server", nil
+}
+
+func (com InvalidCommand) run() (string, error) {
+	return nil, errors.New("Invalid command")
+}
+
+func commandRunner(command CommandInterface) {
+	command.run()
+}
+
 func parseCommand(command string) CommandInterface {
 	commandArray := strings.Split(command, "-")
 
@@ -77,38 +107,8 @@ func parseCommand(command string) CommandInterface {
 			return CamCommand{Command{args}}
 		case "SERVER":
 			return ServerCommand{Command{args}}
-		default:
-			return InvalidCommand{Command{}}
 		}
 	}
-}
 
-func commandRunner(command CommandInterface) {
-	command.run()
-}
-
-// Command Handling
-
-type CommandInterface interface {
-	run() string
-}
-
-type Command struct{ params []string }
-
-type CamCommand struct{ Command }
-
-type ServerCommand struct{ Command }
-
-type invalidCommand struct{ Command }
-
-func (com CamCommand) run() (string, error) {
-	return "", nil
-}
-
-func (com ServerCommand) run() (string, error) {
-	return "", nil
-}
-
-func (com invalidCommand) run() (string, error) {
-	return "", errors.New("Invalid command")
+	return InvalidCommand{Command{}}
 }
