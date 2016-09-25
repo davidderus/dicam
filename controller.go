@@ -4,6 +4,7 @@ import "log"
 
 type controller struct {
 	cameras []camera
+	server  commandServer
 }
 
 func (c *controller) launchCamera(cameraID int) camera {
@@ -61,10 +62,16 @@ func (c controller) stopCamera(cameraID int) {
 	}
 }
 
+func (c *controller) startServer() {
+	server := commandServer{port: 8888}
+	server.start()
+
+	c.server = server
+}
+
 func main() {
 	mainController := controller{}
 
-	mainController.launchCamera(1)
-
-	mainController.stopCamera(1)
+	log.Println("Starting command server")
+	mainController.startServer()
 }

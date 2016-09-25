@@ -39,4 +39,5 @@ func handleConnection(connection net.Conn) {
 	connection.Read(buffer)
 
 	connection.Write([]byte("hello from dicam\n"))
+	connection.Close()
 }
