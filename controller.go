@@ -1,9 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "log"
 
 type controller struct {
 	cameras []camera
@@ -14,10 +11,10 @@ func (c *controller) launchCamera(cameraID int) camera {
 
 	cam.setup()
 
-	fmt.Printf("Starting cam %d\n", cam.id)
+	log.Printf("Starting cam %d\n", cam.id)
 	cam.start()
 
-	fmt.Printf("Camera started with PID %d\n", cam.pid)
+	log.Printf("Camera started with PID %d\n", cam.pid)
 
 	c.cameras = append(c.cameras, cam)
 
@@ -39,24 +36,20 @@ func (c controller) getCameraByID(cameraID int) *camera {
 }
 
 func (c controller) stopCamera(cameraID int) {
-	fmt.Printf("Stopping cam %d\n", cameraID)
+	log.Printf("Stopping cam %d\n", cameraID)
 
 	cam := c.getCameraByID(cameraID)
 	pid := cam.pid
 
 	cam.stop()
 
-	fmt.Printf("Camera stopped via PID %d\n", pid)
+	log.Printf("Camera stopped via PID %d\n", pid)
 }
 
 func main() {
 	mainController := controller{}
 
 	mainController.launchCamera(1)
-
-	time.Sleep(5 * time.Second)
-
-	fmt.Println(mainController.listCameras())
 
 	mainController.stopCamera(1)
 }
