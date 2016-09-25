@@ -10,17 +10,16 @@ import (
 
 // Server logic
 
+const responseErrorCode = "ERROR"
+const responseSuccessCode = "SUCCESS"
+
 type commandServer struct {
 	host string
 	port int
 }
 
-func requestError(connection net.Conn, errorMessage string) {
-	message := "ERROR"
-
-	if errorMessage != "" {
-		message = fmt.Sprintf("%s-%s", message, errorMessage)
-	}
+func sendResponse(connection net.Conn, responseType string, responseMessage string) {
+	message := fmt.Sprintf("%s-%s", responseType, responseMessage)
 
 	connection.Write([]byte(message + "\n"))
 	connection.Close()
@@ -54,13 +53,19 @@ func handleCommand(connection net.Conn) {
 	message, bufferError := bufio.NewReader(connection).ReadString('\n')
 
 	if bufferError != nil {
-		requestError(connection, "")
+		sendResponse(connection, responseErrorCode, bufferError.Error())
 	}
 
 	parsedCommand := parseCommand(strings.TrimRight(string(message), "\n"))
 
 	// todo Return and handle any error
-	commandRunner(parsedCommand)
+	output, runError := commandRunner(parsedCommand)
+
+	if runError != nil {
+		sendResponse(connection, responseErrorCode, runError.Error())
+	} else {
+		sendResponse(connection, responseSuccessCode, output)
+	}
 
 	connection.Close()
 }
@@ -88,11 +93,11 @@ func (com ServerCommand) run() (string, error) {
 }
 
 func (com InvalidCommand) run() (string, error) {
-	return nil, errors.New("Invalid command")
+	return "", errors.New("Invalid command")
 }
 
-func commandRunner(command CommandInterface) {
-	command.run()
+func commandRunner(command CommandInterface) (string, error) {
+	return command.run()
 }
 
 func parseCommand(command string) CommandInterface {
