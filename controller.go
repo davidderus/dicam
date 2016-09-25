@@ -28,7 +28,7 @@ func (c controller) listCameras() []camera {
 	return c.cameras
 }
 
-func (c *controller) getCameraByID(cameraID int) *camera {
+func (c controller) getCameraByID(cameraID int) *camera {
 	for _, cam := range c.cameras {
 		if cam.id == cameraID {
 			return &cam
@@ -38,7 +38,7 @@ func (c *controller) getCameraByID(cameraID int) *camera {
 	panic("No camera found")
 }
 
-func (c *controller) stopCamera(cameraID int) {
+func (c controller) stopCamera(cameraID int) {
 	fmt.Printf("Stopping cam %d\n", cameraID)
 
 	cam := c.getCameraByID(cameraID)
