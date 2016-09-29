@@ -1,15 +1,28 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"net"
 	"os"
 
 	"github.com/davidderus/dicam/controller"
 	"github.com/urfave/cli"
 )
 
+const defaultPort = 8888
+
 func main() {
+	service := fmt.Sprintf("%s:%d", "", defaultPort)
+	tcpAddress, resolveError := net.ResolveTCPAddr("tcp4", service)
+	if resolveError != nil {
+		log.Fatalln(resolveError.Error())
+		return
+	}
+
+	sender, _ := net.Dial("tcp", tcpAddress.String())
+
 	app := cli.NewApp()
 	app.Name = "dicam-cli"
 	app.Usage = "Controls dicam processes and cams"
@@ -26,8 +39,12 @@ func main() {
 					Usage: "Starts the controller",
 					Action: func(c *cli.Context) error {
 						log.Println("Starting command center")
-						cc := controller.CommandCenter{Port: 8888}
-						cc.Start()
+						cc := controller.CommandCenter{Port: defaultPort}
+						startError := cc.Start()
+
+						if startError != nil {
+							log.Fatalln(startError.Error())
+						}
 						return nil
 					},
 				},
@@ -49,7 +66,10 @@ func main() {
 					Name:  "start",
 					Usage: "Starts a camera",
 					Action: func(c *cli.Context) error {
-						fmt.Println("Starting cam", c.Args().First())
+						fmt.Fprintf(sender, "CAM-START-1\n")
+
+						response, _ := bufio.NewReader(sender).ReadString('\n')
+						fmt.Println(response)
 						return nil
 					},
 				},
@@ -57,7 +77,10 @@ func main() {
 					Name:  "stop",
 					Usage: "Stops a camera",
 					Action: func(c *cli.Context) error {
-						fmt.Println("Stopping cam", c.Args().First())
+						fmt.Fprintf(sender, "CAM-START-%s\n", c.Args().First())
+
+						response, _ := bufio.NewReader(sender).ReadString('\n')
+						fmt.Println(response)
 						return nil
 					},
 				},
@@ -65,6 +88,10 @@ func main() {
 					Name:  "list",
 					Usage: "Lists all available cameras",
 					Action: func(c *cli.Context) error {
+						fmt.Fprintf(sender, "CAM-LIST\n")
+
+						response, _ := bufio.NewReader(sender).ReadString('\n')
+						fmt.Println(response)
 						return nil
 					},
 				},
