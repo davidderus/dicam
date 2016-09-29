@@ -3,12 +3,12 @@ package controller
 import "log"
 
 type controller struct {
-	cameras       []camera
-	commandCenter CommandCenter
+	cameras       []*camera
+	commandCenter *CommandCenter
 }
 
-func (c *controller) launchCamera(cameraID int) camera {
-	cam := camera{id: cameraID}
+func (c *controller) launchCamera(cameraID int) *camera {
+	cam := &camera{id: cameraID}
 
 	setupError := cam.setup()
 
@@ -31,14 +31,14 @@ func (c *controller) launchCamera(cameraID int) camera {
 	return cam
 }
 
-func (c controller) listCameras() []camera {
+func (c *controller) listCameras() []*camera {
 	return c.cameras
 }
 
-func (c controller) getCameraByID(cameraID int) *camera {
+func (c *controller) getCameraByID(cameraID int) *camera {
 	for _, cam := range c.cameras {
 		if cam.id == cameraID {
-			return &cam
+			return cam
 		}
 	}
 
@@ -47,7 +47,7 @@ func (c controller) getCameraByID(cameraID int) *camera {
 	return nil
 }
 
-func (c controller) stopCamera(cameraID int) {
+func (c *controller) stopCamera(cameraID int) {
 	log.Printf("Stopping cam %d\n", cameraID)
 
 	cam := c.getCameraByID(cameraID)
@@ -63,13 +63,13 @@ func (c controller) stopCamera(cameraID int) {
 }
 
 func (c *controller) startServer() {
-	cc := CommandCenter{port: 8888}
+	cc := &CommandCenter{port: 8888}
 	cc.start()
 
 	c.commandCenter = cc
 }
 
-func main() {
+func init() {
 	mainController := controller{}
 
 	log.Println("Starting command center")
