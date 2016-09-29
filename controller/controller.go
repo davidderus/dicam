@@ -61,17 +61,3 @@ func (c *controller) stopCamera(cameraID int) {
 		log.Printf("Camera stopped via PID %d\n", pid)
 	}
 }
-
-func (c *controller) startServer() {
-	cc := &CommandCenter{port: 8888}
-	cc.start()
-
-	c.commandCenter = cc
-}
-
-func init() {
-	mainController := controller{}
-
-	log.Println("Starting command center")
-	mainController.startServer()
-}

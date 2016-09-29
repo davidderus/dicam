@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
+	"github.com/davidderus/dicam/controller"
 	"github.com/urfave/cli"
 )
 
@@ -18,8 +20,33 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:    "camera",
+			Name:    "controller",
 			Aliases: []string{"c"},
+			Usage:   "Handles the main app control",
+			Subcommands: []cli.Command{
+				{
+					Name:  "start",
+					Usage: "Starts the controller",
+					Action: func(c *cli.Context) error {
+						log.Println("Starting command center")
+						cc := controller.CommandCenter{Port: 8888}
+						cc.Start()
+						return nil
+					},
+				},
+				{
+					Name:  "stop",
+					Usage: "Stops the controller",
+					Action: func(c *cli.Context) error {
+
+						return nil
+					},
+				},
+			},
+		},
+		{
+			Name:    "camera",
+			Aliases: []string{"cam"},
 			Usage:   "Interacts with a camera",
 			Subcommands: []cli.Command{
 				{

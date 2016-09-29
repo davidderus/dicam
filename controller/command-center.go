@@ -20,8 +20,8 @@ const stopAction = "STOP"
 const listAction = "LIST"
 
 type CommandCenter struct {
-	host string
-	port int
+	Host string
+	Port int
 }
 
 func sendResponse(connection net.Conn, responseType string, responseMessage string) {
@@ -31,8 +31,8 @@ func sendResponse(connection net.Conn, responseType string, responseMessage stri
 	connection.Close()
 }
 
-func (cs *CommandCenter) start() error {
-	service := fmt.Sprintf("%s:%d", cs.host, cs.port)
+func (cs *CommandCenter) Start() error {
+	service := fmt.Sprintf("%s:%d", cs.Host, cs.Port)
 	tcpAddress, resolveError := net.ResolveTCPAddr("tcp4", service)
 	if resolveError != nil {
 		return resolveError
@@ -78,19 +78,19 @@ func handleCommand(connection net.Conn) {
 
 // Command Handling
 
-type CommandInterface interface {
+type commandInterface interface {
 	run() (string, error)
 }
 
-type Command struct{ params []string }
+type command struct{ params []string }
 
-type CamCommand struct{ Command }
+type camCommand struct{ command }
 
-type ServerCommand struct{ Command }
+type serverCommand struct{ command }
 
-type InvalidCommand struct{ Command }
+type invalidCommand struct{ command }
 
-func (com CamCommand) run() (string, error) {
+func (com camCommand) run() (string, error) {
 	action := com.params[0]
 
 	var id string
@@ -113,7 +113,7 @@ func (com CamCommand) run() (string, error) {
 	return "", errors.New(invalidCommandError)
 }
 
-func (com ServerCommand) run() (string, error) {
+func (com serverCommand) run() (string, error) {
 	action := com.params[0]
 
 	switch action {
@@ -126,28 +126,28 @@ func (com ServerCommand) run() (string, error) {
 	return "", errors.New(invalidCommandError)
 }
 
-func (com InvalidCommand) run() (string, error) {
+func (com invalidCommand) run() (string, error) {
 	return "", errors.New(invalidCommandError)
 }
 
-func commandRunner(command CommandInterface) (string, error) {
+func commandRunner(command commandInterface) (string, error) {
 	return command.run()
 }
 
-func parseCommand(command string) CommandInterface {
-	commandArray := strings.Split(command, "-")
+func parseCommand(input string) commandInterface {
+	commandArray := strings.Split(input, "-")
 
 	if len(commandArray) > 1 {
-		command := commandArray[0]
+		mainCommand := commandArray[0]
 		args := commandArray[1:]
 
-		switch command {
+		switch mainCommand {
 		case "CAM":
-			return CamCommand{Command{args}}
+			return camCommand{command{args}}
 		case "SERVER":
-			return ServerCommand{Command{args}}
+			return serverCommand{command{args}}
 		}
 	}
 
-	return InvalidCommand{Command{}}
+	return invalidCommand{command{}}
 }
