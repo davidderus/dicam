@@ -3,8 +3,7 @@ package controller
 import "log"
 
 type controller struct {
-	cameras       []*camera
-	commandCenter *CommandCenter
+	cameras []*camera
 }
 
 func (c *controller) launchCamera(cameraID int) *camera {

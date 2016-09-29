@@ -20,8 +20,9 @@ const stopAction = "STOP"
 const listAction = "LIST"
 
 type CommandCenter struct {
-	Host string
-	Port int
+	Host       string
+	Port       int
+	controller *controller
 }
 
 func sendResponse(connection net.Conn, responseType string, responseMessage string) {
@@ -32,6 +33,8 @@ func sendResponse(connection net.Conn, responseType string, responseMessage stri
 }
 
 func (cs *CommandCenter) Start() error {
+	controller := &controller{}
+
 	service := fmt.Sprintf("%s:%d", cs.Host, cs.Port)
 	tcpAddress, resolveError := net.ResolveTCPAddr("tcp4", service)
 	if resolveError != nil {
@@ -51,11 +54,11 @@ func (cs *CommandCenter) Start() error {
 			return acceptError
 		}
 
-		go handleCommand(connection)
+		go handleCommand(connection, controller)
 	}
 }
 
-func handleCommand(connection net.Conn) {
+func handleCommand(connection net.Conn, controller *controller) {
 	message, bufferError := bufio.NewReader(connection).ReadString('\n')
 
 	if bufferError != nil {
@@ -65,7 +68,7 @@ func handleCommand(connection net.Conn) {
 	parsedCommand := parseCommand(strings.TrimRight(string(message), "\n"))
 
 	// todo Return and handle any error
-	output, runError := commandRunner(parsedCommand)
+	output, runError := commandRunner(parsedCommand, controller)
 
 	if runError != nil {
 		sendResponse(connection, responseErrorCode, runError.Error())
@@ -79,7 +82,7 @@ func handleCommand(connection net.Conn) {
 // Command Handling
 
 type commandInterface interface {
-	run() (string, error)
+	run(controller *controller) (string, error)
 }
 
 type command struct{ params []string }
@@ -90,7 +93,7 @@ type serverCommand struct{ command }
 
 type invalidCommand struct{ command }
 
-func (com camCommand) run() (string, error) {
+func (com camCommand) run(controller *controller) (string, error) {
 	action := com.params[0]
 
 	var id string
@@ -103,35 +106,31 @@ func (com camCommand) run() (string, error) {
 
 	switch action {
 	case startAction:
+		controller.launchCamera(1)
 		return fmt.Sprintf("Starting cam %s", id), nil
 	case stopAction:
+		controller.stopCamera(1)
 		return fmt.Sprintf("Stopping cam %s", id), nil
 	case listAction:
-		return "Listing all cams", nil
+		cams := controller.listCameras()
+		var camsList []string
+
+		for _, cam := range cams {
+			camsList = append(camsList, fmt.Sprintf("Cam. %d - PID %d", cam.id, cam.pid))
+		}
+
+		return strings.Join(camsList, "\n"), nil
 	}
 
 	return "", errors.New(invalidCommandError)
 }
 
-func (com serverCommand) run() (string, error) {
-	action := com.params[0]
-
-	switch action {
-	case startAction:
-		return "Starting webserver", nil
-	case stopAction:
-		return "Stopping webserver", nil
-	}
-
+func (com invalidCommand) run(controller *controller) (string, error) {
 	return "", errors.New(invalidCommandError)
 }
 
-func (com invalidCommand) run() (string, error) {
-	return "", errors.New(invalidCommandError)
-}
-
-func commandRunner(command commandInterface) (string, error) {
-	return command.run()
+func commandRunner(command commandInterface, controller *controller) (string, error) {
+	return command.run(controller)
 }
 
 func parseCommand(input string) commandInterface {
@@ -144,8 +143,6 @@ func parseCommand(input string) commandInterface {
 		switch mainCommand {
 		case "CAM":
 			return camCommand{command{args}}
-		case "SERVER":
-			return serverCommand{command{args}}
 		}
 	}
 

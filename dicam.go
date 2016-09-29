@@ -4,15 +4,12 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/davidderus/dicam/controller"
 	"github.com/urfave/cli"
 )
 
 func main() {
-	cams := []string{"Cam 1", "Cam 2"}
-
 	app := cli.NewApp()
 	app.Name = "dicam-cli"
 	app.Usage = "Controls dicam processes and cams"
@@ -38,7 +35,6 @@ func main() {
 					Name:  "stop",
 					Usage: "Stops the controller",
 					Action: func(c *cli.Context) error {
-
 						return nil
 					},
 				},
@@ -69,7 +65,6 @@ func main() {
 					Name:  "list",
 					Usage: "Lists all available cameras",
 					Action: func(c *cli.Context) error {
-						fmt.Println(strings.Join(cams, "\n"))
 						return nil
 					},
 				},
