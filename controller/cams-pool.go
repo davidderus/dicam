@@ -3,7 +3,6 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -59,8 +58,6 @@ func (cp *CamsPool) getCameraByID(cameraID string) (*camera, error) {
 }
 
 func (cp *CamsPool) stopCamera(cameraID string) (string, error) {
-	log.Printf("Stopping cam %s\n", cameraID)
-
 	cam, findError := cp.getCameraByID(cameraID)
 	if findError != nil {
 		return "", findError

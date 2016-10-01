@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"strings"
 )
@@ -69,8 +70,10 @@ func handleCommand(connection net.Conn) {
 
 	if runError != nil {
 		sendResponse(connection, responseErrorCode, runError.Error())
+		log.Fatalln(runError)
 	} else {
 		sendResponse(connection, responseSuccessCode, output)
+		log.Printf(output)
 	}
 
 	connection.Close()
