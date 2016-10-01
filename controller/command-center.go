@@ -109,14 +109,7 @@ func (com camCommand) run() (string, error) {
 		CamsPoolInstance.stopCamera(1)
 		return fmt.Sprintf("Stopping cam %s", id), nil
 	case listAction:
-		cams := CamsPoolInstance.listCameras()
-		var camsList []string
-
-		for _, cam := range cams {
-			camsList = append(camsList, fmt.Sprintf("Cam. %d - PID %d", cam.id, cam.pid))
-		}
-
-		return strings.Join(camsList, "\n"), nil
+		return CamsPoolInstance.listCameras(), nil
 	}
 
 	return "", errors.New(invalidCommandError)
