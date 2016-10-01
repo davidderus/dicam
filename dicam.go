@@ -76,7 +76,7 @@ func main() {
 					Name:  "stop",
 					Usage: "Stops a camera",
 					Action: func(c *cli.Context) error {
-						fmt.Fprintf(sender, "CAM-START-%s\n", c.Args().First())
+						fmt.Fprintf(sender, "CAM-STOP-%s\n", c.Args().First())
 
 						response, _ := bufio.NewReader(sender).ReadString('\n')
 						fmt.Println(response)
