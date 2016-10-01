@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -54,7 +53,7 @@ func (cp *CamsPool) getCameraByID(cameraID string) (*camera, error) {
 		}
 	}
 
-	return nil, errors.New("No camera found")
+	return nil, fmt.Errorf("No camera %s found", cameraID)
 }
 
 func (cp *CamsPool) stopCamera(cameraID string) (string, error) {

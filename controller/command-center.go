@@ -70,10 +70,10 @@ func handleCommand(connection net.Conn) {
 
 	if runError != nil {
 		sendResponse(connection, responseErrorCode, runError.Error())
-		log.Fatalln(runError)
+		log.Println(runError)
 	} else {
 		sendResponse(connection, responseSuccessCode, output)
-		log.Printf(output)
+		log.Println(output)
 	}
 
 	connection.Close()
