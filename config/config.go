@@ -27,28 +27,21 @@ type watcher struct {
 	countdown int
 }
 
-type options struct {
+type Options struct {
 	motionPath string
 	controller
 	cameras []camera
 }
 
-type Config struct {
-	*options
-}
-
-func (c *Config) read(filename string) (*Config, error) {
+func Read(filename string) (*Options, error) {
 	file, _ := os.Open(filename)
 	decoder := json.NewDecoder(file)
-	config := &Config{}
-	options := &options{}
+	options := &Options{}
 
 	decodeError := decoder.Decode(options)
 	if decodeError != nil {
 		return nil, decodeError
 	}
 
-	config.options = options
-
-	return config, nil
+	return options, nil
 }

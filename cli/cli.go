@@ -5,19 +5,37 @@ import (
 	"log"
 	"os"
 
+	"github.com/davidderus/dicam/config"
 	"github.com/davidderus/dicam/controller"
+
 	"github.com/urfave/cli"
 )
 
 const defaultPort = 8888
 
-func Init(version string) {
+func connectedClient() *Client {
 	client := &Client{Host: "", Port: defaultPort}
 	connectionError := client.Connect()
 
 	if connectionError != nil {
 		log.Fatalln(connectionError)
 	}
+
+	return client
+}
+
+func loadConfig() *config.Options {
+	config, readError := config.Read("config.json")
+	if readError != nil {
+		log.Fatalln(readError)
+	}
+
+	return config
+}
+
+func Init(version string) {
+	loadConfig()
+	client := connectedClient()
 
 	app := cli.NewApp()
 	app.Name = "dicam-cli"
