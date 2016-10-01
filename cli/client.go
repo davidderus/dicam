@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+	"strings"
 )
 
 type Client struct {
@@ -33,7 +34,9 @@ func (c *Client) Connect() error {
 func (c *Client) Ask(command string) string {
 	fmt.Fprintf(c.sender, command+"\n")
 
-	response, _ := bufio.NewReader(c.sender).ReadString('\n')
+	output, _ := bufio.NewReader(c.sender).ReadString('\n')
+	output = strings.TrimRight(string(output), "\n")
 
-	return response
+	response := strings.SplitAfterN(output, "-", 2)
+	return response[1]
 }
