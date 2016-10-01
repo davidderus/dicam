@@ -24,28 +24,15 @@ func Init(version string) {
 		{
 			Name:    "controller",
 			Aliases: []string{"c"},
-			Usage:   "Handles the main app control",
-			Subcommands: []cli.Command{
-				{
-					Name:  "start",
-					Usage: "Starts the controller",
-					Action: func(c *cli.Context) error {
-						log.Println("Starting command center")
-						startError := controller.Start(defaultPort)
+			Usage:   "Starts the app control",
+			Action: func(c *cli.Context) error {
+				log.Println("Starting command center")
+				startError := controller.Start(defaultPort)
 
-						if startError != nil {
-							log.Fatalln(startError)
-						}
-						return nil
-					},
-				},
-				{
-					Name:  "stop",
-					Usage: "Stops the controller",
-					Action: func(c *cli.Context) error {
-						return nil
-					},
-				},
+				if startError != nil {
+					log.Fatalln(startError)
+				}
+				return nil
 			},
 		},
 		{
@@ -85,24 +72,10 @@ func Init(version string) {
 		{
 			Name:    "server",
 			Aliases: []string{"s"},
-			Usage:   "Manages the webserver",
-			Subcommands: []cli.Command{
-				{
-					Name:  "start",
-					Usage: "Starts the webserver",
-					Action: func(c *cli.Context) error {
-						fmt.Println("Starting webserver")
-						return nil
-					},
-				},
-				{
-					Name:  "stop",
-					Usage: "Stops the webserver",
-					Action: func(c *cli.Context) error {
-						fmt.Println("Stopping webserver")
-						return nil
-					},
-				},
+			Usage:   "Starts the webserver",
+			Action: func(c *cli.Context) error {
+				fmt.Println("Starting webserver")
+				return nil
 			},
 		},
 	}
