@@ -11,7 +11,7 @@ import (
 )
 
 type camera struct {
-	id         int
+	id         string
 	pid        int
 	configFile string
 	logFile    string
@@ -34,7 +34,7 @@ const ThreadBaseName = "dicam-thread-%d"
 const DefaultConfigMode = 0644
 
 func (c *camera) setup() error {
-	if c.id == 0 {
+	if len(c.id) == 0 {
 		return errors.New("No id set for camera")
 	}
 
