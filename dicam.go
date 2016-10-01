@@ -39,11 +39,10 @@ func main() {
 					Usage: "Starts the controller",
 					Action: func(c *cli.Context) error {
 						log.Println("Starting command center")
-						cc := controller.CommandCenter{Port: defaultPort}
-						startError := cc.Start()
+						startError := controller.Start(defaultPort)
 
 						if startError != nil {
-							log.Fatalln(startError.Error())
+							log.Fatalln(startError)
 						}
 						return nil
 					},
