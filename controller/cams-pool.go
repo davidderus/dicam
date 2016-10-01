@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -10,31 +11,27 @@ type CamsPool struct {
 	cameras []*camera
 }
 
-func (cp *CamsPool) launchCamera(cameraID string) *camera {
+func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 	cam := &camera{id: cameraID}
 
 	setupError := cam.setup()
 
 	if setupError != nil {
-		log.Fatalln("Error during camera setup:", setupError)
-	} else {
-		log.Printf("Starting cam %d\n", cam.id)
+		return "", setupError
 	}
 
 	startError := cam.start()
 
 	if startError != nil {
-		log.Fatalln("Error during camera launch:", startError)
-	} else {
-		log.Printf("Camera %s started with PID %d\n", cam.id, cam.pid)
+		return "", startError
 	}
 
 	cp.cameras = append(cp.cameras, cam)
 
-	return cam
+	return fmt.Sprintf("Camera %s started with PID %d\n", cam.id, cam.pid), nil
 }
 
-func (cp *CamsPool) listCameras() string {
+func (cp *CamsPool) listCameras() (string, error) {
 	cams := cp.cameras
 	message := "No camera"
 
@@ -42,38 +39,37 @@ func (cp *CamsPool) listCameras() string {
 		var camsList []string
 
 		for _, cam := range cams {
-			camsList = append(camsList, fmt.Sprintf("Cam. %d - PID %d", cam.id, cam.pid))
+			camsList = append(camsList, fmt.Sprintf("Cam. %s - PID %d", cam.id, cam.pid))
 		}
 
 		message = strings.Join(camsList, "\n")
 	}
 
-	return message
+	return message, nil
 }
 
-func (cp *CamsPool) getCameraByID(cameraID string) *camera {
+func (cp *CamsPool) getCameraByID(cameraID string) (*camera, error) {
 	for _, cam := range cp.cameras {
 		if cam.id == cameraID {
-			return cam
+			return cam, nil
 		}
 	}
 
-	log.Fatalln("No camera found")
-
-	return nil
+	return nil, errors.New("No camera found")
 }
 
-func (cp *CamsPool) stopCamera(cameraID string) {
-	log.Printf("Stopping cam %d\n", cameraID)
+func (cp *CamsPool) stopCamera(cameraID string) (string, error) {
+	log.Printf("Stopping cam %s\n", cameraID)
 
-	cam := cp.getCameraByID(cameraID)
-	pid := cam.pid
+	cam, findError := cp.getCameraByID(cameraID)
+	if findError != nil {
+		return "", findError
+	}
 
 	err := cam.stop()
-
 	if err != nil {
-		log.Fatalln("Error while stopping camera:", err)
-	} else {
-		log.Printf("Camera %s stopped via PID %d\n", cameraID, pid)
+		return "", err
 	}
+
+	return fmt.Sprintf("Camera %s stopped via PID %d\n", cameraID, cam.pid), nil
 }

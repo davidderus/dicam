@@ -103,13 +103,11 @@ func (com camCommand) run() (string, error) {
 
 	switch action {
 	case startAction:
-		CamsPoolInstance.launchCamera(id)
-		return fmt.Sprintf("Starting cam %s", id), nil
+		return CamsPoolInstance.launchCamera(id)
 	case stopAction:
-		CamsPoolInstance.stopCamera(id)
-		return fmt.Sprintf("Stopping cam %s", id), nil
+		return CamsPoolInstance.stopCamera(id)
 	case listAction:
-		return CamsPoolInstance.listCameras(), nil
+		return CamsPoolInstance.listCameras()
 	}
 
 	return "", errors.New(invalidCommandError)

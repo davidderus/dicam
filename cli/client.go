@@ -38,5 +38,10 @@ func (c *Client) Ask(command string) string {
 	output = strings.TrimRight(string(output), "\n")
 
 	response := strings.SplitAfterN(output, "-", 2)
-	return response[1]
+
+	if len(response) > 1 {
+		return response[1]
+	} else {
+		return "Unknown response from command center"
+	}
 }
