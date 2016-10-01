@@ -13,7 +13,11 @@ const defaultPort = 8888
 
 func Init(version string) {
 	client := &Client{Host: "", Port: defaultPort}
-	client.Connect()
+	connectionError := client.Connect()
+
+	if connectionError != nil {
+		log.Fatalln(connectionError)
+	}
 
 	app := cli.NewApp()
 	app.Name = "dicam-cli"
