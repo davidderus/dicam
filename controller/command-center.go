@@ -29,7 +29,6 @@ func sendResponse(connection net.Conn, responseType string, responseMessage stri
 	message := fmt.Sprintf("%s-%s", responseType, responseMessage)
 
 	connection.Write([]byte(message + "\n"))
-	connection.Close()
 }
 
 func (cs *CommandCenter) Start() error {
@@ -57,10 +56,13 @@ func (cs *CommandCenter) Start() error {
 }
 
 func handleCommand(connection net.Conn) {
+	defer connection.Close()
+
 	message, bufferError := bufio.NewReader(connection).ReadString('\n')
 
 	if bufferError != nil {
 		sendResponse(connection, responseErrorCode, bufferError.Error())
+		return
 	}
 
 	parsedCommand := parseCommand(strings.TrimRight(string(message), "\n"))
@@ -75,8 +77,6 @@ func handleCommand(connection net.Conn) {
 		sendResponse(connection, responseSuccessCode, output)
 		log.Println(output)
 	}
-
-	connection.Close()
 }
 
 // Command Handling
