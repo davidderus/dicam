@@ -2,15 +2,17 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
 type Camera struct {
+	ID        string
 	Path      string
 	Role      string
 	Autostart bool
-	Notifiers []Notifier
-	Watcher
+	Notifiers []*Notifier
+	*Watcher
 }
 
 type Notifier struct {
@@ -29,8 +31,8 @@ type Watcher struct {
 
 type Options struct {
 	MotionPath string
-	Controller
-	Cameras []Camera
+	*Controller
+	Cameras []*Camera
 }
 
 func Read(filename string) (*Options, error) {
@@ -46,4 +48,26 @@ func Read(filename string) (*Options, error) {
 	}
 
 	return options, nil
+}
+
+func (o *Options) GetAutostartCameras() []*Camera {
+	autostartCameras := []*Camera{}
+
+	for _, cam := range o.Cameras {
+		if cam.Autostart == true {
+			autostartCameras = append(autostartCameras, cam)
+		}
+	}
+
+	return autostartCameras
+}
+
+func (o *Options) GetCameraByID(cameraID string) (*Camera, error) {
+	for _, cam := range o.Cameras {
+		if cam.ID == cameraID {
+			return cam, nil
+		}
+	}
+
+	return nil, fmt.Errorf("No camera %s found", cameraID)
 }
