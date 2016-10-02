@@ -17,7 +17,6 @@ type camera struct {
 	pid        int
 	configFile string
 	logFile    string
-	running    bool
 }
 
 // ConfigDirectory is where the main and thread config are stored

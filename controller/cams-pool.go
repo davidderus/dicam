@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 
 	"github.com/davidderus/dicam/config"
@@ -40,18 +41,30 @@ func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 func (cp *CamsPool) listCameras() (string, error) {
 	cams := cp.cameras
 	message := "No camera"
+	camsList := []string{}
+	camIDS := []string{}
 
-	if len(cams) > 0 {
-		var camsList []string
-
-		for _, cam := range cams {
-			camsList = append(camsList, fmt.Sprintf("Cam. %s - PID %d", cam.id, cam.pid))
-		}
-
-		message = strings.Join(camsList, "\n")
+	// Listing running cams first
+	for _, runningCam := range cams {
+		camsList = append(camsList, fmt.Sprintf("Cam. %s - PID %d", runningCam.id, runningCam.pid))
+		camIDS = append(camIDS, runningCam.id)
 	}
 
+	for camName := range cp.config.Cameras {
+		if inSlice(camName, camIDS) {
+			continue
+		}
+		camsList = append(camsList, fmt.Sprintf("Cam. %s - Not running", camName))
+	}
+
+	message = strings.Join(camsList, "\n")
+
 	return message, nil
+}
+
+func inSlice(needle string, haystack []string) bool {
+	index := sort.SearchStrings(haystack, needle)
+	return index < len(haystack)
 }
 
 func (cp *CamsPool) getCameraByID(cameraID string) (*camera, error) {
