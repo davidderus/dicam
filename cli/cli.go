@@ -70,8 +70,7 @@ func Init(version string) {
 					Name:  "start",
 					Usage: "Starts a camera",
 					Action: func(c *cli.Context) error {
-						response := client.Ask("CAM-START-" + c.Args().First())
-						fmt.Println(response)
+						client.Ask("CAM-START-" + c.Args().First())
 						return nil
 					},
 				},
@@ -79,8 +78,7 @@ func Init(version string) {
 					Name:  "stop",
 					Usage: "Stops a camera",
 					Action: func(c *cli.Context) error {
-						response := client.Ask("CAM-STOP-" + c.Args().First())
-						fmt.Println(response)
+						client.Ask("CAM-STOP-" + c.Args().First())
 						return nil
 					},
 				},
@@ -88,8 +86,7 @@ func Init(version string) {
 					Name:  "list",
 					Usage: "Lists all available cameras",
 					Action: func(c *cli.Context) error {
-						response := client.Ask("CAM-LIST")
-						fmt.Println(response)
+						client.Ask("CAM-LIST")
 						return nil
 					},
 				},
