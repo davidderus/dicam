@@ -7,20 +7,20 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Camera struct {
+type CameraOptions struct {
 	Device    string
 	Role      string
 	Autostart bool `mapstructure:"auto_start"`
-	Notifiers []*Notifier
-	Watcher   *Watcher
+	Notifiers []*NotifierOptions
+	Watcher   *WatcherOptions
 }
 
-type Notifier struct {
+type NotifierOptions struct {
 	Service    string
 	Recipients []string
 }
 
-type Watcher struct {
+type WatcherOptions struct {
 	AutoStart bool `mapstructure:"auto_start"`
 	Countdown int
 }
@@ -29,7 +29,7 @@ type Config struct {
 	Port       int
 	Host       string
 	MotionPath string `mapstructure:"motion_path"`
-	Cameras    map[string]*Camera
+	Cameras    map[string]*CameraOptions
 }
 
 func Read() (*Config, error) {
@@ -95,14 +95,14 @@ func (c *Config) ListCamsToStart() []string {
 	return toStart
 }
 
-func (c *Config) GetCameraConfig(cameraID string) *Camera {
+func (c *Config) GetCameraOptions(cameraID string) (*CameraOptions, error) {
 	availableCams := c.Cameras
 
 	for id, config := range availableCams {
 		if id == cameraID {
-			return config
+			return config, nil
 		}
 	}
 
-	return nil
+	return nil, errors.New("No options available for camera")
 }

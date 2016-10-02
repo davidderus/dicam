@@ -3,16 +3,23 @@ package controller
 import (
 	"fmt"
 	"strings"
+
+	"github.com/davidderus/dicam/config"
 )
 
 type CamsPool struct {
 	cameras []*camera
+	config  *config.Config
 }
 
 func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 	cam := &camera{id: cameraID}
+	camOptions, cameraOptionsError := cp.config.GetCameraOptions(cameraID)
+	if cameraOptionsError != nil {
+		return "", cameraOptionsError
+	}
 
-	setupError := cam.setup()
+	setupError := cam.setup(camOptions)
 
 	if setupError != nil {
 		return "", setupError
