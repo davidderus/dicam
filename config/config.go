@@ -1,73 +1,27 @@
 package config
 
-import (
-	"encoding/json"
-	"fmt"
-	"os"
-)
+import "github.com/spf13/viper"
 
-type Camera struct {
-	ID        string
-	Path      string
-	Role      string
-	Autostart bool
-	Notifiers []*Notifier
-	*Watcher
+type Config struct {
+	Options *viper.Viper
 }
 
-type Notifier struct {
-	Service    string
-	Recipients []string
-}
+func Read() (*Config, error) {
+	options := viper.New()
 
-type Controller struct {
-	Port int
-}
-
-type Watcher struct {
-	Autostart string
-	Countdown int
-}
-
-type Options struct {
-	MotionPath string
-	*Controller
-	Cameras []*Camera
-}
-
-func Read(filename string) (*Options, error) {
-	file, _ := os.Open(filename)
-	defer file.Close()
-
-	decoder := json.NewDecoder(file)
-	options := &Options{}
-
-	decodeError := decoder.Decode(options)
-	if decodeError != nil {
-		return nil, decodeError
+	options.SetConfigName("config")
+	options.AddConfigPath("$HOME/.config/dicam")
+	err := options.ReadInConfig()
+	if err != nil {
+		return nil, err
 	}
 
-	return options, nil
+	config := &Config{}
+	config.Options = options
+
+	return config, nil
 }
 
-func (o *Options) GetAutostartCameras() []*Camera {
-	autostartCameras := []*Camera{}
-
-	for _, cam := range o.Cameras {
-		if cam.Autostart == true {
-			autostartCameras = append(autostartCameras, cam)
-		}
-	}
-
-	return autostartCameras
-}
-
-func (o *Options) GetCameraByID(cameraID string) (*Camera, error) {
-	for _, cam := range o.Cameras {
-		if cam.ID == cameraID {
-			return cam, nil
-		}
-	}
-
-	return nil, fmt.Errorf("No camera %s found", cameraID)
+func (c *Config) Cameras() []string {
+	return c.Options.GetStringSlice("cameras")
 }

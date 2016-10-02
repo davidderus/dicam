@@ -24,8 +24,8 @@ func getClient() *Client {
 	return client
 }
 
-func loadConfig() *config.Options {
-	config, readError := config.Read("config.json")
+func loadConfig() *config.Config {
+	config, readError := config.Read()
 	if readError != nil {
 		log.Fatalln(readError)
 	}
@@ -36,7 +36,11 @@ func loadConfig() *config.Options {
 func Init(version string) {
 	var client *Client
 
-	loadConfig()
+	appConfig := loadConfig()
+	fmt.Println(appConfig.Options.Get("controller.port"))
+	fmt.Println(appConfig.Options.GetStringMap("cameras"))
+	fmt.Println(appConfig.Cameras())
+	os.Exit(1)
 
 	app := cli.NewApp()
 	app.Name = "dicam-cli"
