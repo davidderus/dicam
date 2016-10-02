@@ -7,8 +7,29 @@ import (
 	"github.com/spf13/viper"
 )
 
+type Camera struct {
+	Device    string
+	Role      string
+	Autostart bool `mapstructure:"auto_start"`
+	Notifiers []*Notifier
+	Watcher   *Watcher
+}
+
+type Notifier struct {
+	Service    string
+	Recipients []string
+}
+
+type Watcher struct {
+	AutoStart bool `mapstructure:"auto_start"`
+	Countdown int
+}
+
 type Config struct {
-	Options *viper.Viper
+	Port       int
+	Host       string
+	MotionPath string `mapstructure:"motion_path"`
+	Cameras    map[string]*Camera
 }
 
 func Read() (*Config, error) {
@@ -18,9 +39,9 @@ func Read() (*Config, error) {
 	options.AddConfigPath("$HOME/.config/dicam")
 	setDefaultOptions(options)
 
-	err := options.ReadInConfig()
-	if err != nil {
-		return nil, err
+	readError := options.ReadInConfig()
+	if readError != nil {
+		return nil, readError
 	}
 
 	validationError := validateOptions(options)
@@ -28,23 +49,28 @@ func Read() (*Config, error) {
 		return nil, validationError
 	}
 
-	config := &Config{}
-	config.Options = options
+	var config Config
+	unmarshalError := options.Unmarshal(&config)
+	if unmarshalError != nil {
+		return nil, unmarshalError
+	}
 
-	return config, nil
+	return &config, nil
 }
 
 func setDefaultOptions(options *viper.Viper) {
 	defaultMotionPath, _ := exec.LookPath("motion")
 
-	options.SetDefault("controller.port", 8888)
-	options.SetDefault("controller.host", "")
-	options.SetDefault("motionPath", defaultMotionPath)
+	// Setting default for non nested values
+	// See https://github.com/spf13/viper/issues/162 for related issue
+	options.SetDefault("port", 8888)
+	options.SetDefault("host", "")
+	options.SetDefault("motion_path", defaultMotionPath)
 }
 
 func validateOptions(options *viper.Viper) error {
-	if !options.IsSet("controller.port") || options.GetInt("controller.port") == 0 {
-		return errors.New("Controller port is invalid")
+	if !options.IsSet("port") || options.GetInt("port") == 0 {
+		return errors.New("App port is invalid")
 	}
 
 	if options.Get("motionPath") == "" {
@@ -52,8 +78,4 @@ func validateOptions(options *viper.Viper) error {
 	}
 
 	return nil
-}
-
-func (c *Config) Cameras() map[string]interface{} {
-	return c.Options.Sub("cameras").AllSettings()
 }
