@@ -8,6 +8,7 @@ import (
 
 var CamsPoolInstance *CamsPool
 
+// todo Improve message code logging
 func Start(config *config.Config) error {
 	CamsPoolInstance = &CamsPool{config: config}
 
@@ -18,9 +19,9 @@ func Start(config *config.Config) error {
 		log.Printf("Autostarting camera %s", cameraID)
 		output, autostartError := CamsPoolInstance.launchCamera(cameraID)
 		if autostartError != nil {
-			log.Println(autostartError)
+			log.Printf("ERROR - %s", autostartError)
 		} else {
-			log.Println(output)
+			log.Printf("SUCCESS - %s", output)
 		}
 	}
 
