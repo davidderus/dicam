@@ -47,7 +47,7 @@ func Init(version string) {
 			Aliases: []string{"c"},
 			Usage:   "Starts the app control",
 			Action: func(c *cli.Context) error {
-				log.Printf("Starting command center on %d", appConfig.Port)
+				log.Printf("Starting command center on %s:%d", appConfig.Host, appConfig.Port)
 				startError := controller.Start(appConfig)
 
 				if startError != nil {
