@@ -69,13 +69,18 @@ func handleCommand(connection net.Conn) {
 
 	output, runError := commandRunner(parsedCommand)
 
+	var code, response string
+
 	if runError != nil {
-		sendResponse(connection, responseErrorCode, runError.Error())
-		log.Println(runError)
+		code = responseErrorCode
+		response = runError.Error()
 	} else {
-		sendResponse(connection, responseSuccessCode, output)
-		log.Println(output)
+		code = responseSuccessCode
+		response = output
 	}
+
+	sendResponse(connection, code, response)
+	log.Printf("%s - %s", code, response)
 }
 
 // Command Handling
