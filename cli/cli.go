@@ -11,8 +11,8 @@ import (
 	"github.com/urfave/cli"
 )
 
-func getClient(port int) *Client {
-	client := &Client{Host: "", Port: port}
+func getClient(config *config.Config) *Client {
+	client := &Client{Host: config.Host, Port: config.Port}
 	connectionError := client.Connect()
 
 	if connectionError != nil {
@@ -36,10 +36,6 @@ func Init(version string) {
 
 	appConfig := loadConfig()
 
-	appPort := appConfig.Port
-
-	fmt.Println(appPort)
-
 	app := cli.NewApp()
 	app.Name = "dicam-cli"
 	app.Usage = "Controls dicam processes and cams"
@@ -51,12 +47,13 @@ func Init(version string) {
 			Aliases: []string{"c"},
 			Usage:   "Starts the app control",
 			Action: func(c *cli.Context) error {
-				log.Println("Starting command center")
-				startError := controller.Start(appPort)
+				log.Printf("Starting command center on %d", appConfig.Port)
+				startError := controller.Start(appConfig)
 
 				if startError != nil {
 					log.Fatalln(startError)
 				}
+
 				return nil
 			},
 		},
@@ -65,7 +62,7 @@ func Init(version string) {
 			Aliases: []string{"cam"},
 			Usage:   "Interacts with a camera",
 			Before: func(c *cli.Context) error {
-				client = getClient(appPort)
+				client = getClient(appConfig)
 				return nil
 			},
 			Subcommands: []cli.Command{

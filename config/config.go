@@ -79,3 +79,28 @@ func validateOptions(options *viper.Viper) error {
 
 	return nil
 }
+
+func (c *Config) ListCamsToStart() []string {
+	availableCams := c.Cameras
+	toStart := []string{}
+
+	for name, config := range availableCams {
+		if config.Autostart == true {
+			toStart = append(toStart, name)
+		}
+	}
+
+	return toStart
+}
+
+func (c *Config) GetCameraConfig(cameraID string) *Camera {
+	availableCams := c.Cameras
+
+	for id, config := range availableCams {
+		if id == cameraID {
+			return config
+		}
+	}
+
+	return nil
+}
