@@ -13,7 +13,7 @@ import (
 
 const defaultPort = 8888
 
-func connectedClient() *Client {
+func getClient() *Client {
 	client := &Client{Host: "", Port: defaultPort}
 	connectionError := client.Connect()
 
@@ -34,8 +34,9 @@ func loadConfig() *config.Options {
 }
 
 func Init(version string) {
+	var client *Client
+
 	loadConfig()
-	client := connectedClient()
 
 	app := cli.NewApp()
 	app.Name = "dicam-cli"
@@ -61,6 +62,10 @@ func Init(version string) {
 			Name:    "camera",
 			Aliases: []string{"cam"},
 			Usage:   "Interacts with a camera",
+			Before: func(c *cli.Context) error {
+				client = getClient()
+				return nil
+			},
 			Subcommands: []cli.Command{
 				{
 					Name:  "start",
