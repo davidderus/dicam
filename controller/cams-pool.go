@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/davidderus/dicam/config"
@@ -75,4 +76,21 @@ func (cp *CamsPool) stopCamera(cameraID string) (string, error) {
 	}
 
 	return fmt.Sprintf("Camera %s stopped via PID %d\n", cameraID, cam.pid), nil
+}
+
+// @todo Improve message code logging
+// @todo Externalize logging too
+func (cp *CamsPool) boot() {
+	camsToStart := cp.config.ListCamsToStart()
+
+	// Starting Cameras with Autostart to true
+	for _, cameraID := range camsToStart {
+		log.Printf("Autostarting camera %s", cameraID)
+		output, autostartError := CamsPoolInstance.launchCamera(cameraID)
+		if autostartError != nil {
+			log.Printf("ERROR - %s", autostartError)
+		} else {
+			log.Printf("SUCCESS - %s", output)
+		}
+	}
 }
