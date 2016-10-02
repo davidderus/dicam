@@ -67,7 +67,6 @@ func handleCommand(connection net.Conn) {
 
 	parsedCommand := parseCommand(strings.TrimRight(string(message), "\n"))
 
-	// todo Return and handle any error
 	output, runError := commandRunner(parsedCommand)
 
 	if runError != nil {

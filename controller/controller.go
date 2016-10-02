@@ -1,6 +1,10 @@
 package controller
 
-import "github.com/davidderus/dicam/config"
+import (
+	"log"
+
+	"github.com/davidderus/dicam/config"
+)
 
 var CamsPoolInstance *CamsPool
 
@@ -11,7 +15,13 @@ func Start(config *config.Config) error {
 
 	// Starting Cameras with Autostart to true
 	for _, cameraID := range camsToStart {
-		CamsPoolInstance.launchCamera(cameraID)
+		log.Printf("Autostarting camera %s", cameraID)
+		output, autostartError := CamsPoolInstance.launchCamera(cameraID)
+		if autostartError != nil {
+			log.Println(autostartError)
+		} else {
+			log.Println(output)
+		}
 	}
 
 	cc := &CommandCenter{Port: config.Port}
