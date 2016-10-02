@@ -36,11 +36,7 @@ func loadConfig() *config.Config {
 func Init(version string) {
 	var client *Client
 
-	appConfig := loadConfig()
-	fmt.Println(appConfig.Options.Get("controller.port"))
-	fmt.Println(appConfig.Options.GetStringMap("cameras"))
-	fmt.Println(appConfig.Cameras())
-	os.Exit(1)
+	loadConfig()
 
 	app := cli.NewApp()
 	app.Name = "dicam-cli"
