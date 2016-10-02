@@ -5,36 +5,38 @@ import (
 	"os"
 )
 
-type camera struct {
-	path      string
-	role      string
-	autostart bool
-	notifiers []notifier
-	watcher
+type Camera struct {
+	Path      string
+	Role      string
+	Autostart bool
+	Notifiers []Notifier
+	Watcher
 }
 
-type notifier struct {
-	service    string
-	recipients []string
+type Notifier struct {
+	Service    string
+	Recipients []string
 }
 
-type controller struct {
-	port int
+type Controller struct {
+	Port int
 }
 
-type watcher struct {
-	autostart string
-	countdown int
+type Watcher struct {
+	Autostart string
+	Countdown int
 }
 
 type Options struct {
-	motionPath string
-	controller
-	cameras []camera
+	MotionPath string
+	Controller
+	Cameras []Camera
 }
 
 func Read(filename string) (*Options, error) {
 	file, _ := os.Open(filename)
+	defer file.Close()
+
 	decoder := json.NewDecoder(file)
 	options := &Options{}
 
