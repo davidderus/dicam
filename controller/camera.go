@@ -40,7 +40,18 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 		return errors.New("No id set for camera")
 	}
 
-	fmt.Println(cameraOptions.Device)
+	if len(cameraOptions.Device) == 0 {
+		return errors.New("No device infos set")
+	}
+
+	_, deviceStatError := os.Stat(cameraOptions.Device)
+	if deviceStatError != nil {
+		if os.IsNotExist(deviceStatError) {
+			return fmt.Errorf("Device %s not found, aborting.", cameraOptions.Device)
+		}
+
+		return deviceStatError
+	}
 
 	mainConfigPath := path.Join(ConfigDirectory, MainConfigFile)
 	defaultConfig, readError := ioutil.ReadFile(mainConfigPath)

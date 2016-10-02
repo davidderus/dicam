@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os/exec"
 
 	"github.com/spf13/viper"
@@ -104,5 +105,5 @@ func (c *Config) GetCameraOptions(cameraID string) (*CameraOptions, error) {
 		}
 	}
 
-	return nil, errors.New("No options available for camera")
+	return nil, fmt.Errorf("No options available for camera %s", cameraID)
 }
