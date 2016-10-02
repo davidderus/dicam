@@ -36,7 +36,9 @@ func Read() (*Config, error) {
 	options := viper.New()
 
 	options.SetConfigName("config")
+	options.SetConfigType("toml")
 	options.AddConfigPath("$HOME/.config/dicam")
+	options.AddConfigPath(".")
 	setDefaultOptions(options)
 
 	readError := options.ReadInConfig()
