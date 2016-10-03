@@ -32,10 +32,10 @@ func (c *Client) Connect() error {
 }
 
 func (c *Client) Ask(command string) {
-	fmt.Fprintf(c.sender, command+"\n")
+	fmt.Fprintf(c.sender, command+"\r")
 
-	output, _ := bufio.NewReader(c.sender).ReadString('\n')
-	output = strings.TrimRight(string(output), "\n")
+	output, _ := bufio.NewReader(c.sender).ReadString('\r')
+	output = strings.TrimRight(string(output), "\r")
 
 	response := strings.SplitN(output, "-", 2)
 

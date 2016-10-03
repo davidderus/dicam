@@ -28,7 +28,7 @@ type CommandCenter struct {
 func sendResponse(connection net.Conn, responseType string, responseMessage string) {
 	message := fmt.Sprintf("%s-%s", responseType, responseMessage)
 
-	connection.Write([]byte(message + "\n"))
+	connection.Write([]byte(message + "\r"))
 }
 
 func (cs *CommandCenter) Start() error {
@@ -58,14 +58,14 @@ func (cs *CommandCenter) Start() error {
 func handleCommand(connection net.Conn) {
 	defer connection.Close()
 
-	message, bufferError := bufio.NewReader(connection).ReadString('\n')
+	message, bufferError := bufio.NewReader(connection).ReadString('\r')
 
 	if bufferError != nil {
 		sendResponse(connection, responseErrorCode, bufferError.Error())
 		return
 	}
 
-	parsedCommand := parseCommand(strings.TrimRight(string(message), "\n"))
+	parsedCommand := parseCommand(strings.TrimRight(string(message), "\r"))
 
 	output, runError := commandRunner(parsedCommand)
 
