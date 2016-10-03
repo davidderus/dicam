@@ -57,7 +57,9 @@ func (cp *CamsPool) listCameras() (string, error) {
 		camsList = append(camsList, fmt.Sprintf("Cam. %s - Not running", camName))
 	}
 
-	message = strings.Join(camsList, "\n")
+	if len(camsList) > 0 {
+		message = strings.Join(camsList, "\n")
+	}
 
 	return message, nil
 }

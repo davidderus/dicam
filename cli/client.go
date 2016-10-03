@@ -40,7 +40,11 @@ func (c *Client) Ask(command string) {
 	response := strings.SplitN(output, "-", 2)
 
 	if len(response) > 1 {
-		fmt.Printf("%s: %s", response[0], response[1])
+		if response[0] != "SUCCESS" {
+			fmt.Printf("%s: %s", response[0], response[1])
+		} else {
+			fmt.Println(response[1])
+		}
 	} else {
 		fmt.Println("Unknown response from command center")
 	}
