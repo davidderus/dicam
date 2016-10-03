@@ -8,6 +8,8 @@ import (
 	"os/exec"
 	"path"
 	"syscall"
+
+	"github.com/davidderus/dicam/config"
 )
 
 type camera struct {
@@ -15,7 +17,6 @@ type camera struct {
 	pid        int
 	configFile string
 	logFile    string
-	running    bool
 }
 
 // ConfigDirectory is where the main and thread config are stored
@@ -28,14 +29,27 @@ const MainConfigFile = "motion.conf"
 const LogsDirectory = "logs"
 
 // ThreadBaseName is the model name for a thread configuration file
-const ThreadBaseName = "dicam-thread-%d"
+const ThreadBaseName = "dicam-thread-%s"
 
 // DefaultConfigMode is the file mode for a config file
 const DefaultConfigMode = 0644
 
-func (c *camera) setup() error {
+func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 	if len(c.id) == 0 {
 		return errors.New("No id set for camera")
+	}
+
+	if len(cameraOptions.Device) == 0 {
+		return errors.New("No device infos set")
+	}
+
+	_, deviceStatError := os.Stat(cameraOptions.Device)
+	if deviceStatError != nil {
+		if os.IsNotExist(deviceStatError) {
+			return fmt.Errorf("Device %s not found, aborting.", cameraOptions.Device)
+		}
+
+		return deviceStatError
 	}
 
 	mainConfigPath := path.Join(ConfigDirectory, MainConfigFile)

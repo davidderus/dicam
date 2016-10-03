@@ -5,19 +5,36 @@ import (
 	"log"
 	"os"
 
+	"github.com/davidderus/dicam/config"
 	"github.com/davidderus/dicam/controller"
+
 	"github.com/urfave/cli"
 )
 
-const defaultPort = 8888
-
-func Init(version string) {
-	client := &Client{Host: "", Port: defaultPort}
+func getClient(config *config.Config) *Client {
+	client := &Client{Host: config.Host, Port: config.Port}
 	connectionError := client.Connect()
 
 	if connectionError != nil {
 		log.Fatalln(connectionError)
 	}
+
+	return client
+}
+
+func loadConfig() *config.Config {
+	config, readError := config.Read()
+	if readError != nil {
+		log.Fatalln(readError)
+	}
+
+	return config
+}
+
+func Init(version string) {
+	var client *Client
+
+	appConfig := loadConfig()
 
 	app := cli.NewApp()
 	app.Name = "dicam-cli"
@@ -30,12 +47,13 @@ func Init(version string) {
 			Aliases: []string{"c"},
 			Usage:   "Starts the app control",
 			Action: func(c *cli.Context) error {
-				log.Println("Starting command center")
-				startError := controller.Start(defaultPort)
+				log.Printf("Starting command center on %s:%d", appConfig.Host, appConfig.Port)
+				startError := controller.Start(appConfig)
 
 				if startError != nil {
 					log.Fatalln(startError)
 				}
+
 				return nil
 			},
 		},
@@ -43,13 +61,16 @@ func Init(version string) {
 			Name:    "camera",
 			Aliases: []string{"cam"},
 			Usage:   "Interacts with a camera",
+			Before: func(c *cli.Context) error {
+				client = getClient(appConfig)
+				return nil
+			},
 			Subcommands: []cli.Command{
 				{
 					Name:  "start",
 					Usage: "Starts a camera",
 					Action: func(c *cli.Context) error {
-						response := client.Ask("CAM-START-" + c.Args().First())
-						fmt.Println(response)
+						client.Ask("CAM-START-" + c.Args().First())
 						return nil
 					},
 				},
@@ -57,8 +78,7 @@ func Init(version string) {
 					Name:  "stop",
 					Usage: "Stops a camera",
 					Action: func(c *cli.Context) error {
-						response := client.Ask("CAM-STOP-" + c.Args().First())
-						fmt.Println(response)
+						client.Ask("CAM-STOP-" + c.Args().First())
 						return nil
 					},
 				},
@@ -66,8 +86,7 @@ func Init(version string) {
 					Name:  "list",
 					Usage: "Lists all available cameras",
 					Action: func(c *cli.Context) error {
-						response := client.Ask("CAM-LIST")
-						fmt.Println(response)
+						client.Ask("CAM-LIST")
 						return nil
 					},
 				},

@@ -28,7 +28,7 @@ type CommandCenter struct {
 func sendResponse(connection net.Conn, responseType string, responseMessage string) {
 	message := fmt.Sprintf("%s-%s", responseType, responseMessage)
 
-	connection.Write([]byte(message + "\n"))
+	connection.Write([]byte(message + "\r"))
 }
 
 func (cs *CommandCenter) Start() error {
@@ -58,25 +58,33 @@ func (cs *CommandCenter) Start() error {
 func handleCommand(connection net.Conn) {
 	defer connection.Close()
 
-	message, bufferError := bufio.NewReader(connection).ReadString('\n')
+	message, bufferError := bufio.NewReader(connection).ReadString('\r')
 
 	if bufferError != nil {
 		sendResponse(connection, responseErrorCode, bufferError.Error())
 		return
 	}
 
-	parsedCommand := parseCommand(strings.TrimRight(string(message), "\n"))
+	trimmedMessage := strings.TrimRight(string(message), "\r")
+	parsedCommand := parseCommand(trimmedMessage)
 
-	// todo Return and handle any error
 	output, runError := commandRunner(parsedCommand)
 
+	var code, response string
+
 	if runError != nil {
-		sendResponse(connection, responseErrorCode, runError.Error())
-		log.Println(runError)
+		code = responseErrorCode
+		response = runError.Error()
+
+		log.Printf("%s - %s - %s", code, trimmedMessage, response)
 	} else {
-		sendResponse(connection, responseSuccessCode, output)
-		log.Println(output)
+		code = responseSuccessCode
+		response = output
+
+		log.Printf("%s - %s", code, trimmedMessage)
 	}
+
+	sendResponse(connection, code, response)
 }
 
 // Command Handling

@@ -31,17 +31,21 @@ func (c *Client) Connect() error {
 	return nil
 }
 
-func (c *Client) Ask(command string) string {
-	fmt.Fprintf(c.sender, command+"\n")
+func (c *Client) Ask(command string) {
+	fmt.Fprintf(c.sender, command+"\r")
 
-	output, _ := bufio.NewReader(c.sender).ReadString('\n')
-	output = strings.TrimRight(string(output), "\n")
+	output, _ := bufio.NewReader(c.sender).ReadString('\r')
+	output = strings.TrimRight(string(output), "\r")
 
-	response := strings.SplitAfterN(output, "-", 2)
+	response := strings.SplitN(output, "-", 2)
 
 	if len(response) > 1 {
-		return response[1]
+		if response[0] != "SUCCESS" {
+			fmt.Printf("%s: %s", response[0], response[1])
+		} else {
+			fmt.Println(response[1])
+		}
 	} else {
-		return "Unknown response from command center"
+		fmt.Println("Unknown response from command center")
 	}
 }

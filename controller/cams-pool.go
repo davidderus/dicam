@@ -2,17 +2,26 @@ package controller
 
 import (
 	"fmt"
+	"log"
+	"sort"
 	"strings"
+
+	"github.com/davidderus/dicam/config"
 )
 
 type CamsPool struct {
 	cameras []*camera
+	config  *config.Config
 }
 
 func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 	cam := &camera{id: cameraID}
+	camOptions, cameraOptionsError := cp.config.GetCameraOptions(cameraID)
+	if cameraOptionsError != nil {
+		return "", cameraOptionsError
+	}
 
-	setupError := cam.setup()
+	setupError := cam.setup(camOptions)
 
 	if setupError != nil {
 		return "", setupError
@@ -32,18 +41,32 @@ func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 func (cp *CamsPool) listCameras() (string, error) {
 	cams := cp.cameras
 	message := "No camera"
+	camsList := []string{}
+	camIDS := []string{}
 
-	if len(cams) > 0 {
-		var camsList []string
+	// Listing running cams first
+	for _, runningCam := range cams {
+		camsList = append(camsList, fmt.Sprintf("Cam. %s - PID %d", runningCam.id, runningCam.pid))
+		camIDS = append(camIDS, runningCam.id)
+	}
 
-		for _, cam := range cams {
-			camsList = append(camsList, fmt.Sprintf("Cam. %s - PID %d", cam.id, cam.pid))
+	for camName := range cp.config.Cameras {
+		if inSlice(camName, camIDS) {
+			continue
 		}
+		camsList = append(camsList, fmt.Sprintf("Cam. %s - Not running", camName))
+	}
 
+	if len(camsList) > 0 {
 		message = strings.Join(camsList, "\n")
 	}
 
 	return message, nil
+}
+
+func inSlice(needle string, haystack []string) bool {
+	index := sort.SearchStrings(haystack, needle)
+	return index < len(haystack)
 }
 
 func (cp *CamsPool) getCameraByID(cameraID string) (*camera, error) {
@@ -68,4 +91,21 @@ func (cp *CamsPool) stopCamera(cameraID string) (string, error) {
 	}
 
 	return fmt.Sprintf("Camera %s stopped via PID %d\n", cameraID, cam.pid), nil
+}
+
+// @todo Improve message code logging
+// @todo Externalize logging too
+func (cp *CamsPool) boot() {
+	camsToStart := cp.config.ListCamsToStart()
+
+	// Starting Cameras with Autostart to true
+	for _, cameraID := range camsToStart {
+		log.Printf("Autostarting camera %s", cameraID)
+		output, autostartError := CamsPoolInstance.launchCamera(cameraID)
+		if autostartError != nil {
+			log.Printf("ERROR - %s", autostartError)
+		} else {
+			log.Printf("SUCCESS - %s", output)
+		}
+	}
 }
