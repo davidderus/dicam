@@ -65,7 +65,8 @@ func handleCommand(connection net.Conn) {
 		return
 	}
 
-	parsedCommand := parseCommand(strings.TrimRight(string(message), "\r"))
+	trimmedMessage := strings.TrimRight(string(message), "\r")
+	parsedCommand := parseCommand(trimmedMessage)
 
 	output, runError := commandRunner(parsedCommand)
 
@@ -74,13 +75,16 @@ func handleCommand(connection net.Conn) {
 	if runError != nil {
 		code = responseErrorCode
 		response = runError.Error()
+
+		log.Printf("%s - %s - %s", code, trimmedMessage, response)
 	} else {
 		code = responseSuccessCode
 		response = output
+
+		log.Printf("%s - %s", code, trimmedMessage)
 	}
 
 	sendResponse(connection, code, response)
-	log.Printf("%s - %s", code, response)
 }
 
 // Command Handling
