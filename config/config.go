@@ -11,6 +11,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// CameraOptions lists the options allowed for a camera
 type CameraOptions struct {
 	Device          string
 	Width           int
@@ -24,16 +25,19 @@ type CameraOptions struct {
 	Watcher         *WatcherOptions
 }
 
+// NotifierOptions includes the option for a notifier
 type NotifierOptions struct {
 	Service    string
 	Recipients []string
 }
 
+// WatcherOptions defines the watcher options
 type WatcherOptions struct {
 	AutoStart bool `toml:"auto_start"`
 	Countdown int
 }
 
+// Config is the default config object
 type Config struct {
 	Port       int
 	Host       string
@@ -60,6 +64,7 @@ const ThreadBaseName = "dicam-thread-%s"
 // DefaultConfigMode is the file mode for a config file
 const DefaultConfigMode = 0644
 
+// Read reads config for dicam
 func Read() (*Config, error) {
 	user, userError := user.Current()
 	if userError != nil {
@@ -128,6 +133,7 @@ func (c *Config) populateWorkingDir() error {
 	return nil
 }
 
+// ListCamsToStart returns ids of cameras to start at boot time
 func (c *Config) ListCamsToStart() []string {
 	availableCams := c.Cameras
 	toStart := []string{}
@@ -141,6 +147,7 @@ func (c *Config) ListCamsToStart() []string {
 	return toStart
 }
 
+// GetCameraOptions returns the CameraOptions for a given cameraID
 func (c *Config) GetCameraOptions(cameraID string) (*CameraOptions, error) {
 	availableCams := c.Cameras
 
