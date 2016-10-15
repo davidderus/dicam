@@ -9,6 +9,7 @@ import (
 	"github.com/davidderus/dicam/config"
 )
 
+// CamsPool stores all started Cams
 type CamsPool struct {
 	cameras []*camera
 	config  *config.Config
