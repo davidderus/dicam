@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"os/user"
 	"path"
@@ -29,10 +30,11 @@ type WatcherOptions struct {
 }
 
 type Config struct {
-	Port       int
-	Host       string
-	MotionPath string `toml:"motion_path"`
-	Cameras    map[string]*CameraOptions
+	Port         int
+	Host         string
+	MotionPath   string `toml:"motion_path"`
+	DicamTmpPath string `toml:"dicam_tmp_path"`
+	Cameras      map[string]*CameraOptions
 }
 
 func Read() (*Config, error) {
@@ -68,6 +70,7 @@ func (c *Config) setDefaults() {
 	c.Port = 8888
 	c.Host = ""
 	c.MotionPath = defaultMotionPath
+	c.DicamTmpPath = path.Join(os.TempDir(), "dicam")
 }
 
 func (c *Config) validate() error {
