@@ -37,13 +37,23 @@ type Config struct {
 	Cameras    map[string]*CameraOptions
 }
 
-// TemplatesDirectoryName is where the main and thread config are stored
-const TemplatesDirectoryName = "templates"
+// TemplatesDirectory is where the main and thread config are stored
+const TemplatesDirectory = "templates"
 
+// ConfigDirectoryName is the name for the thread configs directory
 const ConfigDirectoryName = "configs"
 
-// LogsDirectoryName is where the motion logs are stored
+// LogsDirectoryName is the name for the directory where the motion logs are stored
 const LogsDirectoryName = "logs"
+
+// MainConfigFileTemplate is the default motion config
+const MainConfigFileTemplate = "motion.conf.tpl"
+
+// ThreadBaseName is the model name for a thread configuration file
+const ThreadBaseName = "dicam-thread-%s"
+
+// DefaultConfigMode is the file mode for a config file
+const DefaultConfigMode = 0644
 
 func Read() (*Config, error) {
 	user, userError := user.Current()
@@ -100,12 +110,12 @@ func (c *Config) validate() error {
 
 func (c *Config) populateWorkingDir() error {
 	// Adds logs and config files directories
-	mkdirConfigError := os.MkdirAll(path.Join(c.WorkingDir, ConfigDirectoryName), 0644)
+	mkdirConfigError := os.MkdirAll(path.Join(c.WorkingDir, ConfigDirectoryName), DefaultConfigMode)
 	if mkdirConfigError != nil {
 		return mkdirConfigError
 	}
 
-	mkdirLogsError := os.MkdirAll(path.Join(c.WorkingDir, LogsDirectoryName), 0644)
+	mkdirLogsError := os.MkdirAll(path.Join(c.WorkingDir, LogsDirectoryName), DefaultConfigMode)
 	if mkdirLogsError != nil {
 		return mkdirLogsError
 	}

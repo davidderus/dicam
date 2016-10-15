@@ -21,15 +21,6 @@ type camera struct {
 	userOptions *config.CameraOptions
 }
 
-// MainConfigFileTemplate is the default motion config
-const MainConfigFileTemplate = "motion.conf.tpl"
-
-// ThreadBaseName is the model name for a thread configuration file
-const ThreadBaseName = "dicam-thread-%s"
-
-// DefaultConfigMode is the file mode for a config file
-const DefaultConfigMode = 0644
-
 func (c *camera) setWorkingDir(directory string) {
 	c.workingDir = directory
 }
@@ -64,10 +55,10 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 
 // todo: Do not rewrite config file if options are unchanged
 func (c *camera) buildConfig() error {
-	mainConfigPath := path.Join(config.TemplatesDirectoryName, MainConfigFileTemplate)
+	mainConfigPath := path.Join(config.TemplatesDirectory, config.MainConfigFileTemplate)
 
-	threadName := fmt.Sprintf(ThreadBaseName, c.id)
-	c.configFile = path.Join(c.workingDir, config.TemplatesDirectoryName, threadName+".conf")
+	threadName := fmt.Sprintf(config.ThreadBaseName, c.id)
+	c.configFile = path.Join(c.workingDir, config.ConfigDirectoryName, threadName+".conf")
 	c.logFile = path.Join(c.workingDir, config.LogsDirectoryName, threadName+".log")
 
 	// Read from default template
