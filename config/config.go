@@ -27,7 +27,7 @@ type CameraOptions struct {
 	// EventGap is `gap` in Motion config
 	EventGap int `toml:"event_gap"`
 
-	// Role is one of []string{"stream", "role"}
+	// Role is one of []string{"stream", "watch"}
 	Role string
 
 	// Autostart defines if the camera should be started at boot

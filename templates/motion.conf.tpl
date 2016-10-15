@@ -388,8 +388,10 @@ timelapse_filename %Y%m%d-timelapse
 # Live Webcam Server
 ############################################################
 
+{{if .Role == "stream"}}
 # The mini-http server listens to this port for requests (default: 0 = disabled)
-webcam_port 0
+webcam_port 8081
+{{end}}
 
 # Quality of the jpeg (in percent) images produced (default: 50)
 webcam_quality 50
