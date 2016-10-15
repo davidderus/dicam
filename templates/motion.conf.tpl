@@ -66,15 +66,21 @@ frequency 0
 # well as mpeg movies. Valid values: 0 (default = no rotation), 90, 180 and 270.
 rotate 0
 
+{{with .Width}}
 # Image width (pixels). Valid range: Camera dependent, default: 352
-width 320
+width {{.}}
+{{end}}
 
+{{with .Height}}
 # Image height (pixels). Valid range: Camera dependent, default: 288
-height 240
+height {{.}}
+{{end}}
 
+{{with .Framerate}}
 # Maximum number of frames to be captured per second.
 # Valid range: 2-100. Default: 100 (almost no limit).
-framerate 2
+framerate {{.}}
+{{end}}
 
 # Minimum time in seconds between capturing picture frames from the camera.
 # Default: 0 = disabled - the capture rate is given by the camera framerate.
@@ -148,9 +154,11 @@ switchfilter off
 # Motion Detection Settings:
 ############################################################
 
+{{with .MotionThreshold}}
 # Threshold for number of changed pixels in an image that
 # triggers motion detection (default: 1500)
-threshold 1500
+threshold {{.MotionThreshold}}
+{{end}}
 
 # Automatically tune the threshold down if possible (default: off)
 threshold_tune off
@@ -200,11 +208,13 @@ pre_capture 0
 # Number of frames to capture after motion is no longer detected (default: 0)
 post_capture 0
 
+{{with .EventGap}}
 # Gap is the seconds of no motion detection that triggers the end of an event
 # An event is defined as a series of motion images taken within a short timeframe.
 # Recommended value is 60 seconds (Default). The value 0 is allowed and disables
 # events causing all Motion to be written to one single mpeg file and no pre_capture.
-gap 60
+gap {{.}}
+{{end}}
 
 # Maximum length in seconds of an mpeg movie
 # When value is exceeded a new mpeg file is created. (Default: 0 = infinite)
@@ -397,7 +407,7 @@ timelapse_filename %Y%m%d-timelapse
 ############################################################
 
 # The mini-http server listens to this port for requests (default: 0 = disabled)
-webcam_port 8081
+webcam_port 0
 
 # Quality of the jpeg (in percent) images produced (default: 50)
 webcam_quality 50
@@ -423,7 +433,7 @@ webcam_limit 0
 ############################################################
 
 # TCP/IP port for the http server to listen on (default: 0 = disabled)
-control_port 8080
+control_port 0
 
 # Restrict control connections to localhost only (default: on)
 control_localhost on

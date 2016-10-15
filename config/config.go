@@ -12,11 +12,16 @@ import (
 )
 
 type CameraOptions struct {
-	Device    string
-	Role      string
-	Autostart bool `toml:"auto_start"`
-	Notifiers []*NotifierOptions
-	Watcher   *WatcherOptions
+	Device          string
+	Width           int
+	Height          int
+	Framerate       int
+	MotionThreshold int `toml:"motion_threshold"`
+	EventGap        int `toml:"event_gap"`
+	Role            string
+	Autostart       bool `toml:"auto_start"`
+	Notifiers       []*NotifierOptions
+	Watcher         *WatcherOptions
 }
 
 type NotifierOptions struct {
