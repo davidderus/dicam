@@ -13,37 +13,57 @@ import (
 
 // CameraOptions lists the options allowed for a camera
 type CameraOptions struct {
-	Device          string
+	// Device address like /dev/video0
+	Device string
+
+	// Motion options
 	Width           int
 	Height          int
 	Framerate       int
 	MotionThreshold int `toml:"motion_threshold"`
 	EventGap        int `toml:"event_gap"`
-	Role            string
-	Autostart       bool `toml:"auto_start"`
-	Notifiers       []*NotifierOptions
-	Watcher         *WatcherOptions
+
+	// Role is one of []string{"stream", "role"}
+	Role string
+
+	// Autostart defines if the camera should be started at boot
+	Autostart bool `toml:"auto_start"`
+
+	Notifiers []*NotifierOptions
+	Watcher   *WatcherOptions
 }
 
 // NotifierOptions includes the option for a notifier
 type NotifierOptions struct {
-	Service    string
+	// Notifying service name
+	Service string
+
+	// Notifications recipients
 	Recipients []string
 }
 
 // WatcherOptions defines the watcher options
 type WatcherOptions struct {
+	// AutoStart indicates whether the watcher should start with the camera
 	AutoStart bool `toml:"auto_start"`
+
+	// Countdown before a notification is sent
 	Countdown int
 }
 
 // Config is the default config object
 type Config struct {
-	Port       int
-	Host       string
+	Port int
+	Host string
+
+	// Path to motion binary
 	MotionPath string `toml:"motion_path"`
+
+	// Directory where logs and generated config files are stored
 	WorkingDir string `toml:"working_dir"`
-	Cameras    map[string]*CameraOptions
+
+	// Listing of Camera with their options
+	Cameras map[string]*CameraOptions
 }
 
 // TemplatesDirectory is where the main and thread config are stored
