@@ -4,14 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"os/user"
+	"path"
 
-	"github.com/spf13/viper"
+	"github.com/BurntSushi/toml"
 )
 
 type CameraOptions struct {
 	Device    string
 	Role      string
-	Autostart bool `mapstructure:"auto_start"`
+	Autostart bool `toml:"auto_start"`
 	Notifiers []*NotifierOptions
 	Watcher   *WatcherOptions
 }
@@ -22,61 +24,58 @@ type NotifierOptions struct {
 }
 
 type WatcherOptions struct {
-	AutoStart bool `mapstructure:"auto_start"`
+	AutoStart bool `toml:"auto_start"`
 	Countdown int
 }
 
 type Config struct {
 	Port       int
 	Host       string
-	MotionPath string `mapstructure:"motion_path"`
+	MotionPath string `toml:"motion_path"`
 	Cameras    map[string]*CameraOptions
 }
 
 func Read() (*Config, error) {
-	options := viper.New()
-
-	options.SetConfigName("config")
-	options.SetConfigType("toml")
-	options.AddConfigPath("$HOME/.config/dicam")
-	options.AddConfigPath(".")
-	setDefaultOptions(options)
-
-	readError := options.ReadInConfig()
-	if readError != nil {
-		return nil, readError
+	user, userError := user.Current()
+	if userError != nil {
+		return nil, userError
 	}
 
-	validationError := validateOptions(options)
-	if validationError != nil {
-		return nil, validationError
-	}
+	userHomeDir := user.HomeDir
+
+	configFullPath := path.Join(userHomeDir, ".config/dicam/config.toml")
 
 	var config Config
-	unmarshalError := options.Unmarshal(&config)
-	if unmarshalError != nil {
-		return nil, unmarshalError
+
+	_, configError := toml.DecodeFile(configFullPath, &config)
+	if configError != nil {
+		return nil, configError
+	}
+
+	config.setDefaults()
+
+	validationError := config.validate()
+	if validationError != nil {
+		return nil, validationError
 	}
 
 	return &config, nil
 }
 
-func setDefaultOptions(options *viper.Viper) {
+func (c *Config) setDefaults() {
 	defaultMotionPath, _ := exec.LookPath("motion")
 
-	// Setting default for non nested values
-	// See https://github.com/spf13/viper/issues/162 for related issue
-	options.SetDefault("port", 8888)
-	options.SetDefault("host", "")
-	options.SetDefault("motion_path", defaultMotionPath)
+	c.Port = 8888
+	c.Host = ""
+	c.MotionPath = defaultMotionPath
 }
 
-func validateOptions(options *viper.Viper) error {
-	if !options.IsSet("port") || options.GetInt("port") == 0 {
+func (c *Config) validate() error {
+	if c.Port == 0 {
 		return errors.New("App port is invalid")
 	}
 
-	if options.Get("motionPath") == "" {
+	if c.MotionPath == "" {
 		return errors.New("Path to motion is invalid or motion is not available")
 	}
 
