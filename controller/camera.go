@@ -63,6 +63,7 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 	return nil
 }
 
+// todo: Do not rewrite config file if options are unchanged
 func (c *camera) buildConfig() error {
 	mainConfigPath := path.Join(TemplatesDirectory, MainConfigFileTemplate)
 
