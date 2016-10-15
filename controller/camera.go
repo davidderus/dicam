@@ -17,23 +17,22 @@ type camera struct {
 	pid         int
 	configFile  string
 	logFile     string
+	workingDir  string
 	userOptions *config.CameraOptions
 }
 
-// TemplatesDirectory is where the main and thread config are stored
-const TemplatesDirectory = "templates"
-
 // MainConfigFileTemplate is the default motion config
 const MainConfigFileTemplate = "motion.conf.tpl"
-
-// LogsDirectory is where the motion logs are stored
-const LogsDirectory = "logs"
 
 // ThreadBaseName is the model name for a thread configuration file
 const ThreadBaseName = "dicam-thread-%s"
 
 // DefaultConfigMode is the file mode for a config file
 const DefaultConfigMode = 0644
+
+func (c *camera) setWorkingDir(directory string) {
+	c.workingDir = directory
+}
 
 func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 	if len(c.id) == 0 {
@@ -65,11 +64,11 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 
 // todo: Do not rewrite config file if options are unchanged
 func (c *camera) buildConfig() error {
-	mainConfigPath := path.Join(TemplatesDirectory, MainConfigFileTemplate)
+	mainConfigPath := path.Join(config.TemplatesDirectoryName, MainConfigFileTemplate)
 
 	threadName := fmt.Sprintf(ThreadBaseName, c.id)
-	c.configFile = path.Join(TemplatesDirectory, threadName+".conf")
-	c.logFile = path.Join(LogsDirectory, threadName+".log")
+	c.configFile = path.Join(c.workingDir, config.TemplatesDirectoryName, threadName+".conf")
+	c.logFile = path.Join(c.workingDir, config.LogsDirectoryName, threadName+".log")
 
 	// Read from default template
 	template, parseError := template.ParseFiles(mainConfigPath)

@@ -21,6 +21,8 @@ func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 		return "", cameraOptionsError
 	}
 
+	cam.setWorkingDir(cp.config.WorkingDir)
+
 	setupError := cam.setup(camOptions)
 
 	if setupError != nil {

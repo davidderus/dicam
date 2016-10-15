@@ -30,12 +30,20 @@ type WatcherOptions struct {
 }
 
 type Config struct {
-	Port         int
-	Host         string
-	MotionPath   string `toml:"motion_path"`
-	DicamTmpPath string `toml:"dicam_tmp_path"`
-	Cameras      map[string]*CameraOptions
+	Port       int
+	Host       string
+	MotionPath string `toml:"motion_path"`
+	WorkingDir string `toml:"working_dir"`
+	Cameras    map[string]*CameraOptions
 }
+
+// TemplatesDirectoryName is where the main and thread config are stored
+const TemplatesDirectoryName = "templates"
+
+const ConfigDirectoryName = "configs"
+
+// LogsDirectoryName is where the motion logs are stored
+const LogsDirectoryName = "logs"
 
 func Read() (*Config, error) {
 	user, userError := user.Current()
@@ -61,6 +69,11 @@ func Read() (*Config, error) {
 		return nil, validationError
 	}
 
+	populateError := config.populateWorkingDir()
+	if populateError != nil {
+		return nil, populateError
+	}
+
 	return &config, nil
 }
 
@@ -70,7 +83,7 @@ func (c *Config) setDefaults() {
 	c.Port = 8888
 	c.Host = ""
 	c.MotionPath = defaultMotionPath
-	c.DicamTmpPath = path.Join(os.TempDir(), "dicam")
+	c.WorkingDir = path.Join(os.TempDir(), "dicam")
 }
 
 func (c *Config) validate() error {
@@ -80,6 +93,21 @@ func (c *Config) validate() error {
 
 	if c.MotionPath == "" {
 		return errors.New("Path to motion is invalid or motion is not available")
+	}
+
+	return nil
+}
+
+func (c *Config) populateWorkingDir() error {
+	// Adds logs and config files directories
+	mkdirConfigError := os.MkdirAll(path.Join(c.WorkingDir, ConfigDirectoryName), 0644)
+	if mkdirConfigError != nil {
+		return mkdirConfigError
+	}
+
+	mkdirLogsError := os.MkdirAll(path.Join(c.WorkingDir, LogsDirectoryName), 0644)
+	if mkdirLogsError != nil {
+		return mkdirLogsError
 	}
 
 	return nil
@@ -101,9 +129,9 @@ func (c *Config) ListCamsToStart() []string {
 func (c *Config) GetCameraOptions(cameraID string) (*CameraOptions, error) {
 	availableCams := c.Cameras
 
-	for id, config := range availableCams {
+	for id, options := range availableCams {
 		if id == cameraID {
-			return config, nil
+			return options, nil
 		}
 	}
 
