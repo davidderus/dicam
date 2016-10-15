@@ -7,12 +7,14 @@ import (
 	"strings"
 )
 
+// Client defines basic client options
 type Client struct {
 	Host   string
 	Port   int
 	sender net.Conn
 }
 
+// Connect opens a tcp channel to the CommandCenter
 func (c *Client) Connect() error {
 	service := fmt.Sprintf("%s:%d", c.Host, c.Port)
 	tcpAddress, resolveError := net.ResolveTCPAddr("tcp4", service)
@@ -31,6 +33,7 @@ func (c *Client) Connect() error {
 	return nil
 }
 
+// Ask sends a request to the CommandCenter
 func (c *Client) Ask(command string) {
 	fmt.Fprintf(c.sender, command+"\r")
 

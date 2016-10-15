@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"os/user"
 	"path"
@@ -10,31 +11,84 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// CameraOptions lists the options allowed for a camera
 type CameraOptions struct {
-	Device    string
-	Role      string
+	// Device address like /dev/video0
+	Device string
+
+	// Basic Motion options
+	Width     int
+	Height    int
+	Framerate int
+
+	// MotionThreshold is `threshold` in Motion config
+	MotionThreshold int `toml:"motion_threshold"`
+
+	// EventGap is `gap` in Motion config
+	EventGap int `toml:"event_gap"`
+
+	// Role is one of []string{"stream", "watch"}
+	Role string
+
+	// Autostart defines if the camera should be started at boot
 	Autostart bool `toml:"auto_start"`
+
 	Notifiers []*NotifierOptions
 	Watcher   *WatcherOptions
 }
 
+// NotifierOptions includes the option for a notifier
 type NotifierOptions struct {
-	Service    string
+	// Notifying service name
+	Service string
+
+	// Notifications recipients
 	Recipients []string
 }
 
+// WatcherOptions defines the watcher options
 type WatcherOptions struct {
+	// AutoStart indicates whether the watcher should start with the camera
 	AutoStart bool `toml:"auto_start"`
+
+	// Countdown before a notification is sent
 	Countdown int
 }
 
+// Config is the default config object
 type Config struct {
-	Port       int
-	Host       string
+	Port int
+	Host string
+
+	// Path to motion binary
 	MotionPath string `toml:"motion_path"`
-	Cameras    map[string]*CameraOptions
+
+	// Directory where logs and generated config files are stored
+	WorkingDir string `toml:"working_dir"`
+
+	// Listing of Camera with their options
+	Cameras map[string]*CameraOptions
 }
 
+// TemplatesDirectory is where the main and thread config are stored
+const TemplatesDirectory = "templates"
+
+// ConfigDirectoryName is the name for the thread configs directory
+const ConfigDirectoryName = "configs"
+
+// LogsDirectoryName is the name for the directory where the motion logs are stored
+const LogsDirectoryName = "logs"
+
+// MainConfigFileTemplate is the default motion config
+const MainConfigFileTemplate = "motion.conf.tpl"
+
+// ThreadBaseName is the model name for a thread configuration file
+const ThreadBaseName = "dicam-thread-%s"
+
+// DefaultConfigMode is the file mode for a config file
+const DefaultConfigMode = 0644
+
+// Read reads config for dicam
 func Read() (*Config, error) {
 	user, userError := user.Current()
 	if userError != nil {
@@ -59,6 +113,11 @@ func Read() (*Config, error) {
 		return nil, validationError
 	}
 
+	populateError := config.populateWorkingDir()
+	if populateError != nil {
+		return nil, populateError
+	}
+
 	return &config, nil
 }
 
@@ -68,6 +127,7 @@ func (c *Config) setDefaults() {
 	c.Port = 8888
 	c.Host = ""
 	c.MotionPath = defaultMotionPath
+	c.WorkingDir = path.Join(os.TempDir(), "dicam")
 }
 
 func (c *Config) validate() error {
@@ -82,6 +142,22 @@ func (c *Config) validate() error {
 	return nil
 }
 
+func (c *Config) populateWorkingDir() error {
+	// Adds logs and config files directories
+	mkdirConfigError := os.MkdirAll(path.Join(c.WorkingDir, ConfigDirectoryName), DefaultConfigMode)
+	if mkdirConfigError != nil {
+		return mkdirConfigError
+	}
+
+	mkdirLogsError := os.MkdirAll(path.Join(c.WorkingDir, LogsDirectoryName), DefaultConfigMode)
+	if mkdirLogsError != nil {
+		return mkdirLogsError
+	}
+
+	return nil
+}
+
+// ListCamsToStart returns ids of cameras to start at boot time
 func (c *Config) ListCamsToStart() []string {
 	availableCams := c.Cameras
 	toStart := []string{}
@@ -95,12 +171,13 @@ func (c *Config) ListCamsToStart() []string {
 	return toStart
 }
 
+// GetCameraOptions returns the CameraOptions for a given cameraID
 func (c *Config) GetCameraOptions(cameraID string) (*CameraOptions, error) {
 	availableCams := c.Cameras
 
-	for id, config := range availableCams {
+	for id, options := range availableCams {
 		if id == cameraID {
-			return config, nil
+			return options, nil
 		}
 	}
 

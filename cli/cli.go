@@ -31,6 +31,7 @@ func loadConfig() *config.Config {
 	return config
 }
 
+// Init starts Dicam command line interface
 func Init(version string) {
 	var client *Client
 

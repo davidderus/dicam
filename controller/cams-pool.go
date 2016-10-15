@@ -9,6 +9,7 @@ import (
 	"github.com/davidderus/dicam/config"
 )
 
+// CamsPool stores all started Cams
 type CamsPool struct {
 	cameras []*camera
 	config  *config.Config
@@ -20,6 +21,8 @@ func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 	if cameraOptionsError != nil {
 		return "", cameraOptionsError
 	}
+
+	cam.setWorkingDir(cp.config.WorkingDir)
 
 	setupError := cam.setup(camOptions)
 

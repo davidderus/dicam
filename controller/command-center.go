@@ -20,6 +20,7 @@ const startAction = "START"
 const stopAction = "STOP"
 const listAction = "LIST"
 
+// CommandCenter stores the CommandCenter listener config
 type CommandCenter struct {
 	Host string
 	Port int
@@ -31,6 +32,7 @@ func sendResponse(connection net.Conn, responseType string, responseMessage stri
 	connection.Write([]byte(message + "\r"))
 }
 
+// Start starts the CommandCenter tcp listener
 func (cs *CommandCenter) Start() error {
 	service := fmt.Sprintf("%s:%d", cs.Host, cs.Port)
 	tcpAddress, resolveError := net.ResolveTCPAddr("tcp4", service)

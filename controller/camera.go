@@ -3,7 +3,7 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"html/template"
 	"os"
 	"os/exec"
 	"path"
@@ -13,26 +13,17 @@ import (
 )
 
 type camera struct {
-	id         string
-	pid        int
-	configFile string
-	logFile    string
+	id          string
+	pid         int
+	configFile  string
+	logFile     string
+	workingDir  string
+	userOptions *config.CameraOptions
 }
 
-// ConfigDirectory is where the main and thread config are stored
-const ConfigDirectory = "config"
-
-// MainConfigFile is the default motion config
-const MainConfigFile = "motion.conf"
-
-// LogsDirectory is where the motion logs are stored
-const LogsDirectory = "logs"
-
-// ThreadBaseName is the model name for a thread configuration file
-const ThreadBaseName = "dicam-thread-%s"
-
-// DefaultConfigMode is the file mode for a config file
-const DefaultConfigMode = 0644
+func (c *camera) setWorkingDir(directory string) {
+	c.workingDir = directory
+}
 
 func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 	if len(c.id) == 0 {
@@ -52,23 +43,42 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 		return deviceStatError
 	}
 
-	mainConfigPath := path.Join(ConfigDirectory, MainConfigFile)
-	defaultConfig, readError := ioutil.ReadFile(mainConfigPath)
+	c.userOptions = cameraOptions
 
-	if readError != nil {
-		return errors.New("Can not read main config file")
+	configError := c.buildConfig()
+	if configError != nil {
+		return configError
 	}
 
-	threadName := fmt.Sprintf(ThreadBaseName, c.id)
-	c.configFile = path.Join(ConfigDirectory, threadName+".conf")
-	c.logFile = path.Join(LogsDirectory, threadName+".log")
+	return nil
+}
 
-	// @note For now config is the default hard coded config
-	configBytes := []byte(defaultConfig)
-	writeError := ioutil.WriteFile(c.configFile, configBytes, DefaultConfigMode)
+// todo: Do not rewrite config file if options are unchanged
+func (c *camera) buildConfig() error {
+	mainConfigPath := path.Join(config.TemplatesDirectory, config.MainConfigFileTemplate)
 
-	if writeError != nil {
-		return writeError
+	threadName := fmt.Sprintf(config.ThreadBaseName, c.id)
+	c.configFile = path.Join(c.workingDir, config.ConfigDirectoryName, threadName+".conf")
+	c.logFile = path.Join(c.workingDir, config.LogsDirectoryName, threadName+".log")
+
+	// Read from default template
+	template, parseError := template.ParseFiles(mainConfigPath)
+	if parseError != nil {
+		return errors.New("Can not read nor parse main config template")
+	}
+
+	// Execute config options against template
+	outputConfig, configError := os.Create(c.configFile)
+	if configError != nil {
+		return errors.New("Can not open thread config")
+	}
+
+	defer outputConfig.Close()
+
+	// Write to file
+	templateExecuteError := template.Execute(outputConfig, c.userOptions)
+	if templateExecuteError != nil {
+		return templateExecuteError
 	}
 
 	return nil
