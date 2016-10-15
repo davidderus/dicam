@@ -52,6 +52,15 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 		return deviceStatError
 	}
 
+	configError := c.buildConfig()
+	if configError != nil {
+		return configError
+	}
+
+	return nil
+}
+
+func (c *camera) buildConfig() error {
 	mainConfigPath := path.Join(ConfigDirectory, MainConfigFile)
 	defaultConfig, readError := ioutil.ReadFile(mainConfigPath)
 
