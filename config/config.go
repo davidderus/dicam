@@ -16,12 +16,16 @@ type CameraOptions struct {
 	// Device address like /dev/video0
 	Device string
 
-	// Motion options
-	Width           int
-	Height          int
-	Framerate       int
+	// Basic Motion options
+	Width     int
+	Height    int
+	Framerate int
+
+	// MotionThreshold is `threshold` in Motion config
 	MotionThreshold int `toml:"motion_threshold"`
-	EventGap        int `toml:"event_gap"`
+
+	// EventGap is `gap` in Motion config
+	EventGap int `toml:"event_gap"`
 
 	// Role is one of []string{"stream", "role"}
 	Role string
