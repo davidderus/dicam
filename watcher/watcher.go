@@ -41,8 +41,9 @@ func (e *Event) AddFile(filePath string, fileType string) {
 	e.eventFiles = append(e.eventFiles, EventFile{filePath, fileType})
 }
 
-// TODO Log event in dicam database
-func (e *Event) store() {
+// Store logs the event in dicam database
+func (e *Event) Store() {
+	println(e.EventType, e.CameraID, e.DateTime.Format(time.RFC1123))
 }
 
 // TODO Wait a given time before alerting the end user

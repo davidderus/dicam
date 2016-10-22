@@ -119,6 +119,8 @@ func Init(version string) {
 					watcherEvent.AddFile(c.Args().Get(3), c.Args().Get(4))
 				}
 
+				watcherEvent.Store()
+
 				return nil
 			},
 		},
