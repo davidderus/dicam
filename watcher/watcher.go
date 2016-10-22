@@ -8,9 +8,9 @@ import (
 
 // Event is a motion at a given time
 type Event struct {
-	eventType  string
-	cameraID   string
-	dateTime   time.Time
+	EventType  string
+	CameraID   string
+	DateTime   time.Time
 	eventFiles []EventFile
 }
 
@@ -20,7 +20,7 @@ type EventFile struct {
 	fileType string
 }
 
-func (e *Event) setDateTime(motionTime string) error {
+func (e *Event) SetDateTime(motionTime string) error {
 	unixTime, parseError := strconv.ParseInt(motionTime, 10, 64)
 	if parseError != nil {
 		log.Fatalf("%s is not a valid epoch time", motionTime)
@@ -31,12 +31,13 @@ func (e *Event) setDateTime(motionTime string) error {
 		log.Fatalln("Can't parse given time")
 	}
 
-	e.dateTime = parsedDateTime
+	e.DateTime = parsedDateTime
 
 	return nil
 }
 
-func (e *Event) addFile(filePath string, fileType string) {
+// Addfile adds files to the current Event
+func (e *Event) AddFile(filePath string, fileType string) {
 	e.eventFiles = append(e.eventFiles, EventFile{filePath, fileType})
 }
 
