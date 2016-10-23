@@ -86,7 +86,7 @@ const MainConfigFileTemplate = "motion.conf.tpl"
 const ThreadBaseName = "dicam-thread-%s"
 
 // DefaultConfigMode is the file mode for a config file
-const DefaultConfigMode = 0644
+const DefaultConfigMode = 0700
 
 // Read reads config for dicam
 func Read() (*Config, error) {
@@ -106,12 +106,7 @@ func Read() (*Config, error) {
 		return nil, configError
 	}
 
-	config.setDefaults()
-
-	validationError := config.validate()
-	if validationError != nil {
-		return nil, validationError
-	}
+	config.setDefaults(userHomeDir)
 
 	populateError := config.populateWorkingDir()
 	if populateError != nil {
@@ -121,13 +116,13 @@ func Read() (*Config, error) {
 	return &config, nil
 }
 
-func (c *Config) setDefaults() {
+func (c *Config) setDefaults(userDir string) {
 	defaultMotionPath, _ := exec.LookPath("motion")
 
 	c.Port = 8888
 	c.Host = ""
 	c.MotionPath = defaultMotionPath
-	c.WorkingDir = path.Join(os.TempDir(), "dicam")
+	c.WorkingDir = path.Join(userDir, ".dicam")
 }
 
 func (c *Config) validate() error {
@@ -143,7 +138,11 @@ func (c *Config) validate() error {
 }
 
 func (c *Config) populateWorkingDir() error {
-	// Adds logs and config files directories
+	userDirError := os.MkdirAll(c.WorkingDir, DefaultConfigMode)
+	if userDirError != nil {
+		return userDirError
+	}
+
 	mkdirConfigError := os.MkdirAll(path.Join(c.WorkingDir, ConfigDirectoryName), DefaultConfigMode)
 	if mkdirConfigError != nil {
 		return mkdirConfigError

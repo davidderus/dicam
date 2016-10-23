@@ -7,26 +7,39 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"syscall"
 
 	"github.com/davidderus/dicam/config"
 )
 
 type camera struct {
-	id          string
+	ID          string
 	pid         int
 	configFile  string
 	logFile     string
 	workingDir  string
-	userOptions *config.CameraOptions
+	WatcherPath string
+	UserOptions *config.CameraOptions
 }
 
 func (c *camera) setWorkingDir(directory string) {
 	c.workingDir = directory
 }
 
+func (c *camera) getWatcherPath() error {
+	appDir, appDirError := filepath.Abs(filepath.Dir(os.Args[0]))
+	if appDirError != nil {
+		return appDirError
+	}
+
+	c.WatcherPath = appDir
+
+	return nil
+}
+
 func (c *camera) setup(cameraOptions *config.CameraOptions) error {
-	if len(c.id) == 0 {
+	if len(c.ID) == 0 {
 		return errors.New("No id set for camera")
 	}
 
@@ -43,7 +56,12 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 		return deviceStatError
 	}
 
-	c.userOptions = cameraOptions
+	c.UserOptions = cameraOptions
+
+	watcherError := c.getWatcherPath()
+	if watcherError != nil {
+		return watcherError
+	}
 
 	configError := c.buildConfig()
 	if configError != nil {
@@ -57,14 +75,14 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 func (c *camera) buildConfig() error {
 	mainConfigPath := path.Join(config.TemplatesDirectory, config.MainConfigFileTemplate)
 
-	threadName := fmt.Sprintf(config.ThreadBaseName, c.id)
+	threadName := fmt.Sprintf(config.ThreadBaseName, c.ID)
 	c.configFile = path.Join(c.workingDir, config.ConfigDirectoryName, threadName+".conf")
 	c.logFile = path.Join(c.workingDir, config.LogsDirectoryName, threadName+".log")
 
 	// Read from default template
 	template, parseError := template.ParseFiles(mainConfigPath)
 	if parseError != nil {
-		return errors.New("Can not read nor parse main config template")
+		return errors.New("Can not read nor parse main config template: " + parseError.Error())
 	}
 
 	// Execute config options against template
@@ -76,7 +94,7 @@ func (c *camera) buildConfig() error {
 	defer outputConfig.Close()
 
 	// Write to file
-	templateExecuteError := template.Execute(outputConfig, c.userOptions)
+	templateExecuteError := template.Execute(outputConfig, c)
 	if templateExecuteError != nil {
 		return templateExecuteError
 	}
@@ -93,6 +111,8 @@ func (c *camera) start() error {
 	}
 
 	c.pid = command.Process.Pid
+
+	command.Process.Release()
 
 	return nil
 }

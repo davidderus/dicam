@@ -16,7 +16,7 @@ type CamsPool struct {
 }
 
 func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
-	cam := &camera{id: cameraID}
+	cam := &camera{ID: cameraID}
 	camOptions, cameraOptionsError := cp.config.GetCameraOptions(cameraID)
 	if cameraOptionsError != nil {
 		return "", cameraOptionsError
@@ -38,7 +38,7 @@ func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 
 	cp.cameras = append(cp.cameras, cam)
 
-	return fmt.Sprintf("Camera %s started with PID %d\n", cam.id, cam.pid), nil
+	return fmt.Sprintf("Camera %s started with PID %d\n", cam.ID, cam.pid), nil
 }
 
 func (cp *CamsPool) listCameras() (string, error) {
@@ -49,8 +49,8 @@ func (cp *CamsPool) listCameras() (string, error) {
 
 	// Listing running cams first
 	for _, runningCam := range cams {
-		camsList = append(camsList, fmt.Sprintf("Cam. %s - PID %d", runningCam.id, runningCam.pid))
-		camIDS = append(camIDS, runningCam.id)
+		camsList = append(camsList, fmt.Sprintf("Cam. %s - PID %d", runningCam.ID, runningCam.pid))
+		camIDS = append(camIDS, runningCam.ID)
 	}
 
 	for camName := range cp.config.Cameras {
@@ -74,7 +74,7 @@ func inSlice(needle string, haystack []string) bool {
 
 func (cp *CamsPool) getCameraByID(cameraID string) (*camera, error) {
 	for _, cam := range cp.cameras {
-		if cam.id == cameraID {
+		if cam.ID == cameraID {
 			return cam, nil
 		}
 	}

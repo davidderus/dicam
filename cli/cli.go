@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/davidderus/dicam/config"
 	"github.com/davidderus/dicam/controller"
+	"github.com/davidderus/dicam/watcher"
 
 	"github.com/urfave/cli"
 )
@@ -99,6 +101,32 @@ func Init(version string) {
 			Usage:   "Starts the webserver",
 			Action: func(c *cli.Context) error {
 				fmt.Println("Starting webserver")
+				return nil
+			},
+		},
+		{
+			Name:   "watcher",
+			Hidden: true,
+			Action: func(c *cli.Context) error {
+				cameraID := c.Args().Get(0)
+				eventType := c.Args().Get(1)
+
+				watcherEvent := watcher.Event{
+					CameraID:  cameraID,
+					EventType: eventType,
+				}
+
+				epochTime := c.Args().Get(2)
+				watcherEvent.SetDateTime(epochTime)
+
+				if eventType == "pictureSave" {
+					filePath := c.Args().Get(3)
+					fileTypeBit, _ := strconv.Atoi(c.Args().Get(4))
+					watcherEvent.AddFile(filePath, fileTypeBit)
+				}
+
+				watcherEvent.Trigger()
+
 				return nil
 			},
 		},
