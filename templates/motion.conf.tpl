@@ -8,7 +8,7 @@
 
 # Videodevice to be used for capturing  (default /dev/video0)
 # for FreeBSD default is /dev/bktr0
-videodevice {{.Device}}
+videodevice {{.UserOptions.Device}}
 
 # v4l2_palette allows to choose preferable palette to be use by motion
 # to capture from those supported by your videodevice. (default: 8)
@@ -48,17 +48,17 @@ frequency 0
 # well as mpeg movies. Valid values: 0 (default = no rotation), 90, 180 and 270.
 rotate 0
 
-{{with .Width}}
+{{with .UserOptions.Width}}
 # Image width (pixels). Valid range: Camera dependent, default: 352
 width {{.}}
 {{end}}
 
-{{with .Height}}
+{{with .UserOptions.Height}}
 # Image height (pixels). Valid range: Camera dependent, default: 288
 height {{.}}
 {{end}}
 
-{{with .Framerate}}
+{{with .UserOptions.Framerate}}
 # Maximum number of frames to be captured per second.
 # Valid range: 2-100. Default: 100 (almost no limit).
 framerate {{.}}
@@ -136,7 +136,7 @@ switchfilter off
 # Motion Detection Settings:
 ############################################################
 
-{{with .MotionThreshold}}
+{{with .UserOptions.MotionThreshold}}
 # Threshold for number of changed pixels in an image that
 # triggers motion detection (default: 1500)
 threshold {{.MotionThreshold}}
@@ -190,7 +190,7 @@ pre_capture 0
 # Number of frames to capture after motion is no longer detected (default: 0)
 post_capture 0
 
-{{with .EventGap}}
+{{with .UserOptions.EventGap}}
 # Gap is the seconds of no motion detection that triggers the end of an event
 # An event is defined as a series of motion images taken within a short timeframe.
 # Recommended value is 60 seconds (Default). The value 0 is allowed and disables
@@ -388,7 +388,7 @@ timelapse_filename %Y%m%d-timelapse
 # Live Webcam Server
 ############################################################
 
-{{if .Role == "stream"}}
+{{if .UserOptions.Role == "stream"}}
 # The mini-http server listens to this port for requests (default: 0 = disabled)
 webcam_port 8081
 {{end}}
@@ -484,17 +484,19 @@ track_stepsize 40
 # Note: Motion never beeps when running in daemon mode.
 quiet on
 
+{{if .UserOptions.Role == "watch"}}
 # Command to be executed when an event starts. (default: none)
 # An event starts at first motion detected after a period of no motion defined by gap
-; on_event_start value
+on_event_start {{.WatcherPath}} {{.ID}} "eventStart" "%s"
 
 # Command to be executed when an event ends after a period of no motion
 # (default: none). The period of no motion is defined by option gap.
-; on_event_end value
+on_event_end {{.WatcherPath}} {{.ID}} "eventEnd" "%s"
 
 # Command to be executed when a picture (.ppm|.jpg) is saved (default: none)
 # To give the filename as an argument to a command append it with %f
-; on_picture_save value
+on_picture_save {{.WatcherPath}} {{.ID}} "pictureSave" "%s" "%f" "%n"
+{{end}}
 
 # Command to be executed when a motion frame is detected (default: none)
 ; on_motion_detected value
