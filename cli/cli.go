@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/davidderus/dicam/config"
 	"github.com/davidderus/dicam/controller"
@@ -107,16 +108,21 @@ func Init(version string) {
 			Name:   "watcher",
 			Hidden: true,
 			Action: func(c *cli.Context) error {
+				cameraID := c.Args().Get(0)
 				eventType := c.Args().Get(1)
+
 				watcherEvent := watcher.Event{
-					CameraID:  c.Args().Get(0),
+					CameraID:  cameraID,
 					EventType: eventType,
 				}
 
-				watcherEvent.SetDateTime(c.Args().Get(2))
+				epochTime := c.Args().Get(2)
+				watcherEvent.SetDateTime(epochTime)
 
 				if eventType == "picture" {
-					watcherEvent.AddFile(c.Args().Get(3), c.Args().Get(4))
+					filePath := c.Args().Get(3)
+					fileTypeBit, _ := strconv.Atoi(c.Args().Get(4))
+					watcherEvent.AddFile(filePath, fileTypeBit)
 				}
 
 				watcherEvent.Store()
