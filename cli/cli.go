@@ -119,13 +119,13 @@ func Init(version string) {
 				epochTime := c.Args().Get(2)
 				watcherEvent.SetDateTime(epochTime)
 
-				if eventType == "picture" {
+				if eventType == "pictureSave" {
 					filePath := c.Args().Get(3)
 					fileTypeBit, _ := strconv.Atoi(c.Args().Get(4))
 					watcherEvent.AddFile(filePath, fileTypeBit)
 				}
 
-				watcherEvent.Store()
+				watcherEvent.Trigger()
 
 				return nil
 			},

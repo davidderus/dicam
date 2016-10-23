@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -9,10 +10,10 @@ import (
 
 // Event is a motion at a given time
 type Event struct {
-	EventType  string
-	CameraID   string
-	DateTime   time.Time
-	eventFiles []EventFile
+	EventType string
+	CameraID  string
+	DateTime  time.Time
+	eventFile EventFile
 }
 
 // EventFile is a file linked to an event
@@ -20,6 +21,8 @@ type EventFile struct {
 	filePath string
 	fileType string
 }
+
+const defaultWaitTime = 10
 
 func (e *Event) SetDateTime(motionTime string) error {
 	unixTime, parseError := strconv.ParseInt(motionTime, 10, 64)
@@ -44,20 +47,35 @@ func (e *Event) AddFile(filePath string, fileTypeBit int) {
 		log.Fatalln(convertError)
 	}
 
-	e.eventFiles = append(e.eventFiles, EventFile{filePath, fileType})
+	e.eventFile = EventFile{filePath, fileType}
+}
+
+func (e *Event) Trigger() {
+	e.store()
+	e.startCountdown()
 }
 
 // Store logs the event in dicam database
-func (e *Event) Store() {
-	println(e.EventType, e.CameraID, e.DateTime.Format(time.RFC1123))
+func (e *Event) store() {
+	println(e.EventType, "in", e.CameraID, "at", e.DateTime.Format(time.RFC1123))
 }
 
 // TODO Wait a given time before alerting the end user
 func (e *Event) startCountdown() {
+	e.notify()
 }
 
-// TODO Notify the user with a given string
-func (e *Event) notify(withImage bool) {
+// TODO Notify the user with a given string and file
+func (e *Event) notify() {
+	fmt.Printf("Sending notification in %d seconds\n", defaultWaitTime)
+
+	if e.eventFile.filePath != "" {
+		fmt.Printf("With one %s: %s\n", e.eventFile.fileType, e.eventFile.filePath)
+	}
+
+	time.Sleep(defaultWaitTime * time.Second)
+
+	println("Notification sent!")
 }
 
 func convertFileType(fileTypeBit int) (string, error) {

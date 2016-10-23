@@ -108,11 +108,6 @@ func Read() (*Config, error) {
 
 	config.setDefaults(userHomeDir)
 
-	validationError := config.validate()
-	if validationError != nil {
-		return nil, validationError
-	}
-
 	populateError := config.populateWorkingDir()
 	if populateError != nil {
 		return nil, populateError
