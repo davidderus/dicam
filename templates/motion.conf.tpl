@@ -487,15 +487,15 @@ quiet on
 {{if eq .UserOptions.Role "watch"}}
 # Command to be executed when an event starts. (default: none)
 # An event starts at first motion detected after a period of no motion defined by gap
-on_event_start {{.WatcherPath}} {{.ID}} "eventStart" "%s"
+on_event_start {{.WatcherPath}} watcher {{.ID}} eventStart %s
 
 # Command to be executed when an event ends after a period of no motion
 # (default: none). The period of no motion is defined by option gap.
-on_event_end {{.WatcherPath}} {{.ID}} "eventEnd" "%s"
+on_event_end {{.WatcherPath}} watcher {{.ID}} eventEnd %s
 
 # Command to be executed when a picture (.ppm|.jpg) is saved (default: none)
 # To give the filename as an argument to a command append it with %f
-on_picture_save {{.WatcherPath}} {{.ID}} "pictureSave" "%s" "%f" "%n"
+on_picture_save {{.WatcherPath}} watcher {{.ID}} pictureSave %s "%f" %n
 {{end}}
 
 # Command to be executed when a motion frame is detected (default: none)
