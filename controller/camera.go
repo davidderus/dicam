@@ -82,7 +82,7 @@ func (c *camera) buildConfig() error {
 	// Read from default template
 	template, parseError := template.ParseFiles(mainConfigPath)
 	if parseError != nil {
-		return errors.New("Can not read nor parse main config template")
+		return errors.New("Can not read nor parse main config template: " + parseError.Error())
 	}
 
 	// Execute config options against template
