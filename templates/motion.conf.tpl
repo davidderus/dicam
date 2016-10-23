@@ -388,7 +388,7 @@ timelapse_filename %Y%m%d-timelapse
 # Live Webcam Server
 ############################################################
 
-{{if .UserOptions.Role == "stream"}}
+{{if eq .UserOptions.Role "stream"}}
 # The mini-http server listens to this port for requests (default: 0 = disabled)
 webcam_port 8081
 {{end}}
@@ -484,7 +484,7 @@ track_stepsize 40
 # Note: Motion never beeps when running in daemon mode.
 quiet on
 
-{{if .UserOptions.Role == "watch"}}
+{{if eq .UserOptions.Role "watch"}}
 # Command to be executed when an event starts. (default: none)
 # An event starts at first motion detected after a period of no motion defined by gap
 on_event_start {{.WatcherPath}} {{.ID}} "eventStart" "%s"
