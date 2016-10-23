@@ -112,6 +112,8 @@ func (c *camera) start() error {
 
 	c.pid = command.Process.Pid
 
+	command.Process.Release()
+
 	return nil
 }
 
