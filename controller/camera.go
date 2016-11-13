@@ -16,27 +16,27 @@ import (
 // camera is a physical camera declared in the configuration file with an
 // optionnal PID if it is started
 type camera struct {
-	ID          string
-	pid         int
-	configFile  string
-	logFile     string
-	workingDir  string
-	WatcherPath string
-	UserOptions *config.CameraOptions
+	ID           string
+	pid          int
+	configFile   string
+	logFile      string
+	workingDir   string
+	NotifierPath string
+	UserOptions  *config.CameraOptions
 }
 
 func (c *camera) setWorkingDir(directory string) {
 	c.workingDir = directory
 }
 
-// getWatcherPath gets the binary current path in order to launch watchers
-func (c *camera) getWatcherPath() error {
+// getNotifierPath gets the binary current path in order to launch watchers
+func (c *camera) getNotifierPath() error {
 	appDir, appDirError := filepath.Abs(filepath.Dir(os.Args[0]))
 	if appDirError != nil {
 		return appDirError
 	}
 
-	c.WatcherPath = appDir
+	c.NotifierPath = appDir
 
 	return nil
 }
@@ -63,7 +63,7 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 
 	c.UserOptions = cameraOptions
 
-	watcherError := c.getWatcherPath()
+	watcherError := c.getNotifierPath()
 	if watcherError != nil {
 		return watcherError
 	}

@@ -36,25 +36,18 @@ type CameraOptions struct {
 	Autostart bool `toml:"auto_start"`
 
 	Notifiers []*NotifierOptions
-	Watcher   *WatcherOptions
 }
 
 // NotifierOptions includes the option for a notifier
 type NotifierOptions struct {
+	// Countdown before a notification is sent
+	Countdown int
+
 	// Notifying service name
 	Service string
 
 	// Notifications recipients
 	Recipients []string
-}
-
-// WatcherOptions defines the watcher options
-type WatcherOptions struct {
-	// AutoStart indicates whether the watcher should start with the camera
-	AutoStart bool `toml:"auto_start"`
-
-	// Countdown before a notification is sent
-	Countdown int
 }
 
 // Config is the default config object

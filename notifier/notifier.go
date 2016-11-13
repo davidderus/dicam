@@ -1,6 +1,6 @@
-// Package watcher handles the motion detection event given by motion.
+// Package notifier handles the motion detection event given by motion.
 // It wait a given time and then propagates the event to notifiers.
-package watcher
+package notifier
 
 import (
 	"errors"
@@ -25,8 +25,9 @@ type EventFile struct {
 }
 
 // defaultWaitTime is the time before firing an event
-// This is set in order not to immediatly alert when detecting a motion and
-// letting some time for the user to deactivate the watcher (ie: when entering
+//
+// This is set in order not to immediately alert when detecting a motion and
+// letting some time for the user to deactivate the notifier (ie: when entering
 // his property)
 const defaultWaitTime = 10
 
@@ -70,21 +71,21 @@ func (e *Event) store() {
 	println(e.EventType, "in", e.CameraID, "at", e.DateTime.Format(time.RFC1123))
 }
 
-// TODO Wait a given time before alerting the end user
+// startCountdown waits for a given amount of seconds before sending a
+// notification
 func (e *Event) startCountdown() {
-	e.notify()
-}
-
-// TODO Notify the user with a given string and file
-func (e *Event) notify() {
 	fmt.Printf("Sending notification in %d seconds\n", defaultWaitTime)
+	time.Sleep(defaultWaitTime * time.Second)
 
 	if e.eventFile.filePath != "" {
 		fmt.Printf("With one %s: %s\n", e.eventFile.fileType, e.eventFile.filePath)
 	}
 
-	time.Sleep(defaultWaitTime * time.Second)
+	e.notify()
+}
 
+// TODO Notify the user with a given string and file
+func (e *Event) notify() {
 	println("Notification sent!")
 }
 

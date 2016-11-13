@@ -10,7 +10,7 @@ import (
 
 	"github.com/davidderus/dicam/config"
 	"github.com/davidderus/dicam/controller"
-	"github.com/davidderus/dicam/watcher"
+	"github.com/davidderus/dicam/notifier"
 
 	"github.com/urfave/cli"
 )
@@ -109,27 +109,27 @@ func Init(version string) {
 			},
 		},
 		{
-			Name:   "watcher",
+			Name:   "notifier",
 			Hidden: true,
 			Action: func(c *cli.Context) error {
 				cameraID := c.Args().Get(0)
 				eventType := c.Args().Get(1)
 
-				watcherEvent := watcher.Event{
+				notifierEvent := notifier.Event{
 					CameraID:  cameraID,
 					EventType: eventType,
 				}
 
 				epochTime := c.Args().Get(2)
-				watcherEvent.SetDateTime(epochTime)
+				notifierEvent.SetDateTime(epochTime)
 
 				if eventType == "pictureSave" {
 					filePath := c.Args().Get(3)
 					fileTypeBit, _ := strconv.Atoi(c.Args().Get(4))
-					watcherEvent.AddFile(filePath, fileTypeBit)
+					notifierEvent.AddFile(filePath, fileTypeBit)
 				}
 
-				watcherEvent.Trigger()
+				notifierEvent.Trigger()
 
 				return nil
 			},
