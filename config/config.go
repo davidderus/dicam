@@ -38,9 +38,6 @@ type CameraOptions struct {
 
 // NotifierOptions includes the option for a notifier
 type NotifierOptions struct {
-	// Countdown before a notification is sent
-	Countdown int
-
 	// Notifying service name
 	Service string
 
@@ -53,6 +50,9 @@ type Config struct {
 	Port int
 	Host string
 
+	// Countdown before a notification is sent
+	Countdown int
+
 	// Path to motion binary
 	MotionPath string `toml:"motion_path"`
 
@@ -63,7 +63,7 @@ type Config struct {
 	Cameras map[string]*CameraOptions
 
 	// All cameras with a watch role will use the given Notifiers
-	Notifiers []*NotifierOptions
+	Notifiers map[string]*NotifierOptions
 }
 
 // TemplatesDirectory is where the main and thread config are stored

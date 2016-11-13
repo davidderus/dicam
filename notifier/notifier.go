@@ -8,6 +8,8 @@ import (
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/davidderus/dicam/config"
 )
 
 // Event is a motion at a given time with an optionnal attachment
@@ -15,6 +17,7 @@ type Event struct {
 	EventType string
 	CameraID  string
 	DateTime  time.Time
+	Config    *config.Config
 	eventFile EventFile
 }
 
@@ -64,6 +67,7 @@ func (e *Event) AddFile(filePath string, fileTypeBit int) {
 func (e *Event) Trigger() {
 	e.store()
 	e.startCountdown()
+	e.notify()
 }
 
 // Store logs the event in dicam database
@@ -74,19 +78,25 @@ func (e *Event) store() {
 // startCountdown waits for a given amount of seconds before sending a
 // notification
 func (e *Event) startCountdown() {
-	fmt.Printf("Sending notification in %d seconds\n", defaultWaitTime)
-	time.Sleep(defaultWaitTime * time.Second)
+	waitTime := e.Config.Countdown
+
+	if waitTime == 0 {
+		waitTime = defaultWaitTime
+	}
+
+	fmt.Printf("Sending notification in %d seconds\n", waitTime)
+	time.Sleep(time.Duration(waitTime) * time.Second)
 
 	if e.eventFile.filePath != "" {
 		fmt.Printf("With one %s: %s\n", e.eventFile.fileType, e.eventFile.filePath)
 	}
-
-	e.notify()
 }
 
 // TODO Notify the user with a given string and file
 func (e *Event) notify() {
-	println("Notification sent!")
+	for _, notifier := range e.Config.Notifiers {
+		fmt.Printf("Notification sent to %s!", notifier.Service)
+	}
 }
 
 // convertFileType convers a motion fileTypeBit to an understandable one
