@@ -94,9 +94,35 @@ func (e *Event) startCountdown() {
 
 // TODO Notify the user with a given string and file
 func (e *Event) notify() {
-	for _, notifier := range e.Config.Notifiers {
-		fmt.Printf("Notification sent to %s!", notifier.Service)
+	for _, notifierConfig := range e.Config.Notifiers {
+		var notifier notifierInterface
+		notifier = getNotifier(notifierConfig.Service)
+
+		notifier.send("azerty", notifierConfig.Recipients)
+
+		fmt.Printf("Notification sent to %s!", notifierConfig.Service)
 	}
+}
+
+type notifierInterface interface {
+	send(message string, recipients []string) error
+}
+
+type invalidNotifier struct{}
+
+func (notifier invalidNotifier) send() error {
+	return errors.New("Invalid notifier")
+}
+
+func getNotifier(service string) notifierInterface {
+	switch service {
+	case "pushbullet", "push":
+		return PushbulletNotifier{}
+	case "email", "mail":
+		return EmailNotifier{}
+	}
+
+	return invalidNotifier{}
 }
 
 // convertFileType convers a motion fileTypeBit to an understandable one
