@@ -1,3 +1,5 @@
+// Package cli defines all cli options and instanciates a client to communicate
+// with the CommandCenter
 package cli
 
 import (
@@ -13,6 +15,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// getClient creates a new client to send command to the CommandCenter
 func getClient(config *config.Config) *Client {
 	client := &Client{Host: config.Host, Port: config.Port}
 	connectionError := client.Connect()
@@ -24,6 +27,7 @@ func getClient(config *config.Config) *Client {
 	return client
 }
 
+// loadConfig reads the dicam config file
 func loadConfig() *config.Config {
 	config, readError := config.Read()
 	if readError != nil {

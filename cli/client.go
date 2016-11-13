@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// Client defines basic client options
+// Client allows communication with the CommandCenter
 type Client struct {
 	Host   string
 	Port   int

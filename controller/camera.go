@@ -13,6 +13,8 @@ import (
 	"github.com/davidderus/dicam/config"
 )
 
+// camera is a physical camera declared in the configuration file with an
+// optionnal PID if it is started
 type camera struct {
 	ID          string
 	pid         int
@@ -27,6 +29,7 @@ func (c *camera) setWorkingDir(directory string) {
 	c.workingDir = directory
 }
 
+// getWatcherPath gets the binary current path in order to launch watchers
 func (c *camera) getWatcherPath() error {
 	appDir, appDirError := filepath.Abs(filepath.Dir(os.Args[0]))
 	if appDirError != nil {
@@ -38,6 +41,8 @@ func (c *camera) getWatcherPath() error {
 	return nil
 }
 
+// setup initiates build of a camera config file for motion after checking
+// some basic items
 func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 	if len(c.ID) == 0 {
 		return errors.New("No id set for camera")
@@ -71,7 +76,10 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 	return nil
 }
 
-// todo: Do not rewrite config file if options are unchanged
+// buildConfig builds a motion config file from scratch with the user-defined
+// camera options.
+//
+// TODO Do not rewrite config file if options are unchanged
 func (c *camera) buildConfig() error {
 	mainConfigPath := path.Join(config.TemplatesDirectory, config.MainConfigFileTemplate)
 
@@ -102,6 +110,7 @@ func (c *camera) buildConfig() error {
 	return nil
 }
 
+// start launches a motion binary for the camera
 func (c *camera) start() error {
 	command := exec.Command("motion", "-c", c.configFile, "-l", c.logFile)
 	err := command.Start()

@@ -1,3 +1,5 @@
+// Package watcher handles the motion detection event given by motion.
+// It wait a given time and then propagates the event to notifiers.
 package watcher
 
 import (
@@ -8,7 +10,7 @@ import (
 	"time"
 )
 
-// Event is a motion at a given time
+// Event is a motion at a given time with an optionnal attachment
 type Event struct {
 	EventType string
 	CameraID  string
@@ -16,14 +18,20 @@ type Event struct {
 	eventFile EventFile
 }
 
-// EventFile is a file linked to an event
+// EventFile is an attachment linked to an event
 type EventFile struct {
 	filePath string
 	fileType string
 }
 
+// defaultWaitTime is the time before firing an event
+// This is set in order not to immediatly alert when detecting a motion and
+// letting some time for the user to deactivate the watcher (ie: when entering
+// his property)
 const defaultWaitTime = 10
 
+// SetDateTime parse the epoch time given by motion and update the Event with
+// the normalized value
 func (e *Event) SetDateTime(motionTime string) error {
 	unixTime, parseError := strconv.ParseInt(motionTime, 10, 64)
 	if parseError != nil {
@@ -40,7 +48,8 @@ func (e *Event) SetDateTime(motionTime string) error {
 	return nil
 }
 
-// Addfile adds files to the current Event
+// AddFile adds files to the current Event
+// See convertFileType for allowed fileTypeBit
 func (e *Event) AddFile(filePath string, fileTypeBit int) {
 	fileType, convertError := convertFileType(fileTypeBit)
 	if convertError != nil {
@@ -50,6 +59,7 @@ func (e *Event) AddFile(filePath string, fileTypeBit int) {
 	e.eventFile = EventFile{filePath, fileType}
 }
 
+// Trigger stores the event infos and starts the countdown
 func (e *Event) Trigger() {
 	e.store()
 	e.startCountdown()
@@ -78,6 +88,7 @@ func (e *Event) notify() {
 	println("Notification sent!")
 }
 
+// convertFileType convers a motion fileTypeBit to an understandable one
 func convertFileType(fileTypeBit int) (string, error) {
 	knownFormats := map[int]string{
 		1:  "Normal picture",
