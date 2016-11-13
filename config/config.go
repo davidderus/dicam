@@ -34,8 +34,6 @@ type CameraOptions struct {
 
 	// Autostart defines if the camera should be started at boot
 	Autostart bool `toml:"auto_start"`
-
-	Notifiers []*NotifierOptions
 }
 
 // NotifierOptions includes the option for a notifier
@@ -63,6 +61,9 @@ type Config struct {
 
 	// Listing of Camera with their options
 	Cameras map[string]*CameraOptions
+
+	// All cameras with a watch role will use the given Notifiers
+	Notifiers []*NotifierOptions
 }
 
 // TemplatesDirectory is where the main and thread config are stored
