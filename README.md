@@ -50,7 +50,7 @@ In order to get the last version, grab it from the latest [release](https://gith
 A dicam config file, stored in `~/.config/dicam/config.toml` may look like this:
 
 ```toml
-countdown = 10
+countdown = 30 # In seconds, default to 10
 
 [cameras]
   [cameras.livingroom]

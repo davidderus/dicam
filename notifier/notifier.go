@@ -94,13 +94,22 @@ func (e *Event) startCountdown() {
 
 // TODO Notify the user with a given string and file
 func (e *Event) notify() {
+	if len(e.Config.Notifiers) == 0 {
+		fmt.Println("No notifiers in config, aborting")
+		return
+	}
+
 	for _, notifierConfig := range e.Config.Notifiers {
 		var notifier notifierInterface
 		notifier = getNotifier(notifierConfig.Service)
 
-		notifier.send("azerty", notifierConfig.Recipients)
+		notifyError := notifier.send("azerty", notifierConfig.Recipients)
 
-		fmt.Printf("Notification sent to %s!", notifierConfig.Service)
+		if notifyError != nil {
+			fmt.Printf("%s: %s", notifierConfig.Service, notifyError.Error())
+		}
+
+		fmt.Printf("Notification sent to %s recipients!", notifierConfig.Service)
 	}
 }
 
@@ -111,7 +120,7 @@ type notifierInterface interface {
 type invalidNotifier struct{}
 
 func (notifier invalidNotifier) send(message string, recipients []string) error {
-	return errors.New("Invalid notifier")
+	return errors.New("Invalid notifier in config, no notification sent.")
 }
 
 func getNotifier(service string) notifierInterface {
