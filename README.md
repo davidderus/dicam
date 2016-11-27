@@ -45,7 +45,74 @@ In order to get the last version, grab it from the latest [release](https://gith
 
 ### 3. Run it!
 
+#### A. Setup a config file
+
+A dicam config file, stored in `~/.config/dicam/config.toml` may look like this:
+
+```toml
+countdown = 10
+
+[cameras]
+  [cameras.livingroom]
+  auto_start = false
+  device = "/dev/video0"
+  role = "watch" # Notifications and streaming.
+
+  [cameras.dorms]
+  auto_start = false
+  device = "/dev/video1"
+  role = "stream" # No notifications. Only streaming.
+
+[notifiers]
+  [notifiers.main_mail]
+    service = "email"
+    recipients = [ "test@test.com" ]
+```
+
+#### B. Launch the controller (and command center)
+
+In a shell (*via tmux or screen*), run the following command to launch the command center:
+
+`dicam controller`
+
+Once this is done, you can communicate with dicam with the cli and interact with cameras and services.
+
+The host and port can be changed in the config file as follow:
+
+```toml
+host = 0.0.0.0
+port = 4541
+
+# rest of the config
+```
+
+#### C. Interact with cameras
+
+```shell
+# Launch a camera
+dicam cam start livingroom
+
+# Stop a camera
+dicam cam stop livingroom
+
+# List all cams
+dicam cam list
+```
+
+#### D. Live streams
+
 TODO
+
+## Other notifiers
+
+### Pushbullet
+
+```toml
+[notifiers]
+  [notifiers.push]
+    service = "push"
+    recipients = [ "MYDEVICEID" ]
+```
 
 ## Inner working
 
