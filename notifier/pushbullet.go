@@ -6,10 +6,15 @@ import (
 )
 
 type PushbulletNotifier struct {
-	APIKey string
+	ApiKey string
 }
 
-func (notifier PushbulletNotifier) send(message string, recipients []string, options map[string]string) error {
-	fmt.Printf("Sending push to %s\n", strings.Join(recipients, ", "))
+func (notifier PushbulletNotifier) setOptions(options map[string]string) error {
+	notifier.ApiKey = options["api_key"]
+	return nil
+}
+
+func (notifier PushbulletNotifier) send(message string, recipients []string) error {
+	fmt.Printf("Sending push to %s", strings.Join(recipients, ", "))
 	return nil
 }
