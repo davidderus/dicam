@@ -43,6 +43,9 @@ type NotifierOptions struct {
 
 	// Notifications recipients
 	Recipients []string
+
+	// Service options
+	ServiceOptions map[string]string
 }
 
 // Config is the default config object
