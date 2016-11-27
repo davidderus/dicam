@@ -103,23 +103,20 @@ func (e *Event) notify() {
 		var notifier notifierInterface
 
 		// Getting notifier
-		notifier = getNotifier(notifierConfig.Service)
+		notifier, optionsError := getNotifier(notifierConfig.Service, notifierConfig.ServiceOptions)
 
-		// Setting the notifier options
-		notififierConfigError := notifier.setOptions(notifierConfig.ServiceOptions)
-
-		if notififierConfigError != nil {
-			fmt.Printf("%s: %s", notifierConfig.Service, notififierConfigError.Error())
+		if optionsError != nil {
+			fmt.Printf("%s: %s", notifierConfig.Service, optionsError.Error())
 		}
 
 		// Sending notification
 		notifyError := notifier.send("azerty", notifierConfig.Recipients)
 
 		if notifyError != nil {
-			fmt.Printf("%s: %s", notifierConfig.Service, notifyError.Error())
+			fmt.Printf("%s: %s\n", notifierConfig.Service, notifyError.Error())
 		}
 
-		fmt.Printf("Notification sent to %s recipients!", notifierConfig.Service)
+		fmt.Printf("Notification sent to %s recipients!\n", notifierConfig.Service)
 	}
 }
 
@@ -138,15 +135,21 @@ func (notifier invalidNotifier) setOptions(options map[string]string) error {
 	return nil
 }
 
-func getNotifier(service string) notifierInterface {
+func getNotifier(service string, options map[string]string) (notifierInterface, error) {
 	switch service {
 	case "pushbullet", "push":
-		return PushbulletNotifier{}
+		notifier := &PushbulletNotifier{}
+		notifierOptionsError := notifier.setOptions(options)
+
+		return notifier, notifierOptionsError
 	case "email", "mail":
-		return EmailNotifier{}
+		notifier := &EmailNotifier{}
+		notifierOptionsError := notifier.setOptions(options)
+
+		return notifier, notifierOptionsError
 	}
 
-	return invalidNotifier{}
+	return invalidNotifier{}, nil
 }
 
 // convertFileType convers a motion fileTypeBit to an understandable one

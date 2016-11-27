@@ -45,7 +45,7 @@ type NotifierOptions struct {
 	Recipients []string
 
 	// Service options
-	ServiceOptions map[string]string
+	ServiceOptions map[string]string `toml:"options"`
 }
 
 // Config is the default config object
