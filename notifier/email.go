@@ -1,6 +1,7 @@
 package notifier
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -21,6 +22,18 @@ func (notifier *EmailNotifier) setOptions(options map[string]string) error {
 
 	notifier.From = options["from"]
 	notifier.Password = options["password"]
+
+	return nil
+}
+
+func (notifier *EmailNotifier) validateOptions() error {
+	if notifier.Host == "" || notifier.Port == 0 {
+		return errors.New("Invalid host or port in options")
+	}
+
+	if notifier.From == "" || notifier.Password == "" {
+		return errors.New("A from email and an SMTP password are required")
+	}
 
 	return nil
 }

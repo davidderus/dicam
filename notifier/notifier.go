@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -96,7 +97,7 @@ func (e *Event) startCountdown() {
 func (e *Event) notify() {
 	if len(e.Config.Notifiers) == 0 {
 		fmt.Println("No notifiers in config, aborting")
-		return
+		os.Exit(1)
 	}
 
 	for _, notifierConfig := range e.Config.Notifiers {
@@ -107,6 +108,7 @@ func (e *Event) notify() {
 
 		if optionsError != nil {
 			fmt.Printf("%s: %s", notifierConfig.Service, optionsError.Error())
+			os.Exit(1)
 		}
 
 		// Sending notification
@@ -114,6 +116,7 @@ func (e *Event) notify() {
 
 		if notifyError != nil {
 			fmt.Printf("%s: %s\n", notifierConfig.Service, notifyError.Error())
+			os.Exit(1)
 		}
 
 		fmt.Printf("Notification sent to %s recipients!\n", notifierConfig.Service)
@@ -121,38 +124,55 @@ func (e *Event) notify() {
 }
 
 type notifierInterface interface {
+	// send sends a message to a given set of recipients
 	send(message string, recipients []string) error
+
+	// setOptions defines configuration options for the notifier
 	setOptions(options map[string]string) error
+
+	// validateOptions validates the options given by setOptions and required by
+	// the notifier
+	validateOptions() error
 }
 
 type invalidNotifier struct{}
 
-func (notifier invalidNotifier) send(message string, recipients []string) error {
+func (notifier *invalidNotifier) send(message string, recipients []string) error {
 	return errors.New("Invalid notifier in config, no notification sent.")
 }
 
-func (notifier invalidNotifier) setOptions(options map[string]string) error {
+func (notifier *invalidNotifier) setOptions(options map[string]string) error {
+	return nil
+}
+
+func (notifier *invalidNotifier) validateOptions() error {
 	return nil
 }
 
 func getNotifier(service string, options map[string]string) (notifierInterface, error) {
+	var notifier notifierInterface
+
 	switch service {
 	case "pushbullet", "push":
-		notifier := &PushbulletNotifier{}
-		notifierOptionsError := notifier.setOptions(options)
-
-		return notifier, notifierOptionsError
+		notifier = &PushbulletNotifier{}
 	case "email", "mail":
-		notifier := &EmailNotifier{}
-		notifierOptionsError := notifier.setOptions(options)
+		notifier = &EmailNotifier{}
+	default:
+		return &invalidNotifier{}, nil
+	}
 
+	notifierOptionsError := notifier.setOptions(options)
+
+	if notifierOptionsError != nil {
 		return notifier, notifierOptionsError
 	}
 
-	return invalidNotifier{}, nil
+	notifierValidationError := notifier.validateOptions()
+
+	return notifier, notifierValidationError
 }
 
-// convertFileType convers a motion fileTypeBit to an understandable one
+// convertFileType converts a motion fileTypeBit to an understandable one
 func convertFileType(fileTypeBit int) (string, error) {
 	knownFormats := map[int]string{
 		1:  "Normal picture",
