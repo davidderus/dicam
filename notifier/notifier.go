@@ -105,15 +105,8 @@ func (e *Event) notify() {
 		// Getting notifier
 		notifier = getNotifier(notifierConfig.Service)
 
-		// Setting the notifier options
-		notififierConfigError := notifier.setOptions(notifierConfig.ServiceOptions)
-
-		if notififierConfigError != nil {
-			fmt.Printf("%s: %s", notifierConfig.Service, notififierConfigError.Error())
-		}
-
-		// Sending notification
-		notifyError := notifier.send("azerty", notifierConfig.Recipients)
+		// Sending notification with recipients and service options
+		notifyError := notifier.send("azerty", notifierConfig.Recipients, notifierConfig.ServiceOptions)
 
 		if notifyError != nil {
 			fmt.Printf("%s: %s", notifierConfig.Service, notifyError.Error())
@@ -124,18 +117,13 @@ func (e *Event) notify() {
 }
 
 type notifierInterface interface {
-	send(message string, recipients []string) error
-	setOptions(options map[string]string) error
+	send(message string, recipients []string, options map[string]string) error
 }
 
 type invalidNotifier struct{}
 
-func (notifier invalidNotifier) send(message string, recipients []string) error {
+func (notifier invalidNotifier) send(message string, recipients []string, options map[string]string) error {
 	return errors.New("Invalid notifier in config, no notification sent.")
-}
-
-func (notifier invalidNotifier) setOptions(options map[string]string) error {
-	return nil
 }
 
 func getNotifier(service string) notifierInterface {
