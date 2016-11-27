@@ -3,6 +3,8 @@ package notifier
 import (
 	"errors"
 	"fmt"
+	"log"
+	"net/smtp"
 	"strconv"
 	"strings"
 )
@@ -39,6 +41,29 @@ func (notifier *EmailNotifier) validateOptions() error {
 }
 
 func (notifier *EmailNotifier) send(message string, recipients []string) error {
-	fmt.Printf("Sending email to %s from %s\n", strings.Join(recipients, ", "), notifier.From)
+	log.Printf("Sending email to %s from %s\n", strings.Join(recipients, ", "), notifier.From)
+
+	// Set up authentication information.
+	auth := smtp.PlainAuth(
+		"",
+		notifier.From,
+		notifier.Password,
+		notifier.Host,
+	)
+
+	// Connect to the server, authenticate, set the sender and recipient,
+	// and send the email all in one step.
+	err := smtp.SendMail(
+		fmt.Sprintf("%s:%d", notifier.Host, notifier.Port),
+		auth,
+		notifier.From,
+		recipients,
+		[]byte(message),
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return nil
 }

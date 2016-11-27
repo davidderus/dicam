@@ -2,7 +2,7 @@ package notifier
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"strings"
 )
 
@@ -24,6 +24,6 @@ func (notifier *PushbulletNotifier) validateOptions() error {
 }
 
 func (notifier *PushbulletNotifier) send(message string, recipients []string) error {
-	fmt.Printf("Sending push to %s\n", strings.Join(recipients, ", "))
+	log.Printf("Sending push to %s\n", strings.Join(recipients, ", "))
 	return nil
 }
