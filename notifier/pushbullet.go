@@ -4,6 +4,6 @@ type PushbulletNotifier struct {
 	ApiKey string
 }
 
-func (notifier *PushbulletNotifier) send(message string, recipients []string) {
-
+func (notifier PushbulletNotifier) send(message string, recipients []string) error {
+	return nil
 }

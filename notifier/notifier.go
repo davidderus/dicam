@@ -110,7 +110,7 @@ type notifierInterface interface {
 
 type invalidNotifier struct{}
 
-func (notifier invalidNotifier) send() error {
+func (notifier invalidNotifier) send(message string, recipients []string) error {
 	return errors.New("Invalid notifier")
 }
 

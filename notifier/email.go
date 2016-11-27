@@ -7,6 +7,6 @@ type EmailNotifier struct {
 	Password string
 }
 
-func (notifier *EmailNotifier) send(message string, recipients []string) {
-
+func (notifier EmailNotifier) send(message string, recipients []string) error {
+	return nil
 }
