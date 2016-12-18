@@ -67,6 +67,11 @@ countdown = 30 # In seconds, default to 10
   [notifiers.main_mail]
     service = "email"
     recipients = [ "test@test.com" ]
+    [notifiers.emailer.options]
+      host = "my_host"
+      port = "my_port"
+      from = "myemail@email.fr"
+      password = "azerty"
 ```
 
 #### B. Launch the controller (and command center)
@@ -112,6 +117,8 @@ TODO
   [notifiers.push]
     service = "push"
     recipients = [ "MYDEVICEID" ]
+    [notifiers.pushbullet.options]
+      api_key = "my_api_key"
 ```
 
 ## Inner working
