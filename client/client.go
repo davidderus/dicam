@@ -54,7 +54,7 @@ func (c *Client) Ask(command string) (string, error) {
 	}
 }
 
-// Ask logs the response of the command center
+// Print logs the response of the command center
 // TODO Use a real cli logger to differentiate error from success
 func (c *Client) Print(command string) {
 	askResponse, askError := c.Ask(command)
