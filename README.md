@@ -1,4 +1,4 @@
-# dicam 0.3.0
+# dicam 0.4.0
 
 dicam aims too allow easy management of a network of webcams for surveillance or streaming.
 
