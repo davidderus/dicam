@@ -18,6 +18,7 @@ import (
 type camera struct {
 	ID           string
 	pid          int
+	StreamPort   int
 	configFile   string
 	logFile      string
 	workingDir   string
@@ -27,6 +28,10 @@ type camera struct {
 
 func (c *camera) setWorkingDir(directory string) {
 	c.workingDir = directory
+}
+
+func (c *camera) setStreamPort(streamPort int) {
+	c.StreamPort = streamPort
 }
 
 // getNotifierPath gets the binary current path in order to launch watchers
