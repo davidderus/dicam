@@ -2,6 +2,7 @@ package client
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -33,8 +34,8 @@ func (c *Client) Connect() error {
 	return nil
 }
 
-// Ask sends a request to the CommandCenter
-func (c *Client) Ask(command string) {
+// Ask sends a request to the CommandCenter and returns its response
+func (c *Client) Ask(command string) (string, error) {
 	fmt.Fprintf(c.sender, command+"\r")
 
 	output, _ := bufio.NewReader(c.sender).ReadString('\r')
@@ -44,11 +45,23 @@ func (c *Client) Ask(command string) {
 
 	if len(response) > 1 {
 		if response[0] != "SUCCESS" {
-			fmt.Printf("%s: %s", response[0], response[1])
+			return fmt.Sprintf("%s: %s", response[0], response[1]), nil
 		} else {
-			fmt.Println(response[1])
+			return "", errors.New(fmt.Sprintln(response[1]))
 		}
 	} else {
-		fmt.Println("Unknown response from command center")
+		return "", errors.New(fmt.Sprintln("Unknown response from command center"))
+	}
+}
+
+// Ask logs the response of the command center
+// TODO Use a real cli logger to differentiate error from success
+func (c *Client) Print(command string) {
+	askResponse, askError := c.Ask(command)
+
+	if askError != nil {
+		fmt.Println(askError)
+	} else {
+		fmt.Println(askResponse)
 	}
 }

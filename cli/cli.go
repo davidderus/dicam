@@ -79,7 +79,7 @@ func Init(version string) {
 					Name:  "start",
 					Usage: "Starts a camera",
 					Action: func(c *cli.Context) error {
-						client.Ask("CAM-START-" + c.Args().First())
+						client.Print("CAM-START-" + c.Args().First())
 						return nil
 					},
 				},
@@ -87,7 +87,7 @@ func Init(version string) {
 					Name:  "stop",
 					Usage: "Stops a camera",
 					Action: func(c *cli.Context) error {
-						client.Ask("CAM-STOP-" + c.Args().First())
+						client.Print("CAM-STOP-" + c.Args().First())
 						return nil
 					},
 				},
@@ -95,7 +95,7 @@ func Init(version string) {
 					Name:  "list",
 					Usage: "Lists all available cameras",
 					Action: func(c *cli.Context) error {
-						client.Ask("CAM-LIST")
+						client.Print("CAM-LIST")
 						return nil
 					},
 				},
@@ -103,7 +103,7 @@ func Init(version string) {
 					Name:   "infos",
 					Hidden: true,
 					Action: func(c *cli.Context) error {
-						client.Ask("CAM-INFOS-" + c.Args().First())
+						client.Print("CAM-INFOS-" + c.Args().First())
 						return nil
 					},
 				},
