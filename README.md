@@ -69,7 +69,7 @@ countdown = 30 # In seconds, default to 10
     recipients = [ "test@test.com" ]
     [notifiers.emailer.options]
       host = "my_host"
-      port = "my_port"
+      port = "587" # must be a string
       from = "myemail@email.fr"
       password = "azerty"
 ```

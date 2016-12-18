@@ -43,6 +43,13 @@ func (notifier *EmailNotifier) validateOptions() error {
 func (notifier *EmailNotifier) send(message string, recipients []string) error {
 	log.Printf("Sending email to %s from %s\n", strings.Join(recipients, ", "), notifier.From)
 
+	smtpMessage := fmt.Sprintf(
+		"To: %s\r\nSubject: %s\r\n\r\n%s\r\n",
+		strings.Join(recipients, ","),
+		"Email from dicam",
+		message,
+	)
+
 	// Set up authentication information.
 	auth := smtp.PlainAuth(
 		"",
@@ -58,12 +65,8 @@ func (notifier *EmailNotifier) send(message string, recipients []string) error {
 		auth,
 		notifier.From,
 		recipients,
-		[]byte(message),
+		[]byte(smtpMessage),
 	)
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return err
 }

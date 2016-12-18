@@ -4,6 +4,7 @@ package notifier
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -71,7 +72,7 @@ func (e *Event) Trigger() {
 
 // Store logs the event in dicam database
 func (e *Event) store() {
-	log.Println(e.EventType, "in", e.CameraID, "at", e.DateTime.Format(time.RFC1123))
+	// TODO Store event in database
 }
 
 // startCountdown waits for a given amount of seconds before sending a
@@ -97,6 +98,9 @@ func (e *Event) notify() {
 		log.Fatalf("No notifiers in config, aborting")
 	}
 
+	notifierMessage := fmt.Sprintf("%s in %s at %s", e.EventType, e.CameraID, e.DateTime.Format(time.RFC1123))
+	log.Println(notifierMessage)
+
 	for _, notifierConfig := range e.Config.Notifiers {
 		var notifier notifierInterface
 
@@ -110,7 +114,7 @@ func (e *Event) notify() {
 		}
 
 		// Sending notification
-		notifyError := notifier.send("azerty", notifierConfig.Recipients)
+		notifyError := notifier.send(notifierMessage, notifierConfig.Recipients)
 
 		if notifyError != nil {
 			// We do not use a Fatalf which could prevent execution of other notifiers
