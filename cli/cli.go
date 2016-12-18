@@ -1,3 +1,5 @@
+// Package cli defines all cli options and instanciates a client to communicate
+// with the CommandCenter
 package cli
 
 import (
@@ -8,11 +10,12 @@ import (
 
 	"github.com/davidderus/dicam/config"
 	"github.com/davidderus/dicam/controller"
-	"github.com/davidderus/dicam/watcher"
+	"github.com/davidderus/dicam/notifier"
 
 	"github.com/urfave/cli"
 )
 
+// getClient creates a new client to send command to the CommandCenter
 func getClient(config *config.Config) *Client {
 	client := &Client{Host: config.Host, Port: config.Port}
 	connectionError := client.Connect()
@@ -24,6 +27,7 @@ func getClient(config *config.Config) *Client {
 	return client
 }
 
+// loadConfig reads the dicam config file
 func loadConfig() *config.Config {
 	config, readError := config.Read()
 	if readError != nil {
@@ -105,27 +109,28 @@ func Init(version string) {
 			},
 		},
 		{
-			Name:   "watcher",
+			Name:   "notifier",
 			Hidden: true,
 			Action: func(c *cli.Context) error {
 				cameraID := c.Args().Get(0)
 				eventType := c.Args().Get(1)
 
-				watcherEvent := watcher.Event{
+				notifierEvent := notifier.Event{
 					CameraID:  cameraID,
 					EventType: eventType,
+					Config:    appConfig,
 				}
 
 				epochTime := c.Args().Get(2)
-				watcherEvent.SetDateTime(epochTime)
+				notifierEvent.SetDateTime(epochTime)
 
 				if eventType == "pictureSave" {
 					filePath := c.Args().Get(3)
 					fileTypeBit, _ := strconv.Atoi(c.Args().Get(4))
-					watcherEvent.AddFile(filePath, fileTypeBit)
+					notifierEvent.AddFile(filePath, fileTypeBit)
 				}
 
-				watcherEvent.Trigger()
+				notifierEvent.Trigger()
 
 				return nil
 			},

@@ -1,3 +1,4 @@
 package main
 
-const dicamVersion = "0.3.0"
+// Stores the application version
+const dicamVersion = "0.4.0"

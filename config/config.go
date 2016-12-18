@@ -1,3 +1,5 @@
+// Package config defines and parses configuration for controllers, cameras,
+// notifiers and watchers
 package config
 
 import (
@@ -32,9 +34,6 @@ type CameraOptions struct {
 
 	// Autostart defines if the camera should be started at boot
 	Autostart bool `toml:"auto_start"`
-
-	Notifiers []*NotifierOptions
-	Watcher   *WatcherOptions
 }
 
 // NotifierOptions includes the option for a notifier
@@ -44,21 +43,18 @@ type NotifierOptions struct {
 
 	// Notifications recipients
 	Recipients []string
-}
 
-// WatcherOptions defines the watcher options
-type WatcherOptions struct {
-	// AutoStart indicates whether the watcher should start with the camera
-	AutoStart bool `toml:"auto_start"`
-
-	// Countdown before a notification is sent
-	Countdown int
+	// Service options
+	ServiceOptions map[string]string `toml:"options"`
 }
 
 // Config is the default config object
 type Config struct {
 	Port int
 	Host string
+
+	// Countdown before a notification is sent
+	Countdown int
 
 	// Path to motion binary
 	MotionPath string `toml:"motion_path"`
@@ -68,6 +64,9 @@ type Config struct {
 
 	// Listing of Camera with their options
 	Cameras map[string]*CameraOptions
+
+	// All cameras with a watch role will use the given Notifiers
+	Notifiers map[string]*NotifierOptions
 }
 
 // TemplatesDirectory is where the main and thread config are stored
@@ -116,6 +115,8 @@ func Read() (*Config, error) {
 	return &config, nil
 }
 
+// setDefaults defines default options in configuration such as motion path,
+// controller port and host…
 func (c *Config) setDefaults(userDir string) {
 	defaultMotionPath, _ := exec.LookPath("motion")
 
@@ -125,6 +126,7 @@ func (c *Config) setDefaults(userDir string) {
 	c.WorkingDir = path.Join(userDir, ".dicam")
 }
 
+// validate validates a few config options to prevent further errors
 func (c *Config) validate() error {
 	if c.Port == 0 {
 		return errors.New("App port is invalid")
@@ -137,6 +139,8 @@ func (c *Config) validate() error {
 	return nil
 }
 
+// populateWorkingDir creates the configs and logs directories based on the
+// WorkingDir
 func (c *Config) populateWorkingDir() error {
 	userDirError := os.MkdirAll(c.WorkingDir, DefaultConfigMode)
 	if userDirError != nil {

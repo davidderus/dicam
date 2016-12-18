@@ -32,7 +32,7 @@ func sendResponse(connection net.Conn, responseType string, responseMessage stri
 	connection.Write([]byte(message + "\r"))
 }
 
-// Start starts the CommandCenter tcp listener
+// Start starts the CommandCenter TCP listener
 func (cs *CommandCenter) Start() error {
 	service := fmt.Sprintf("%s:%d", cs.Host, cs.Port)
 	tcpAddress, resolveError := net.ResolveTCPAddr("tcp4", service)
@@ -57,6 +57,8 @@ func (cs *CommandCenter) Start() error {
 	}
 }
 
+// handleCommand receive a tcp command in a given format, parse the relevant
+// informations and run the command before sending a response back
 func handleCommand(connection net.Conn) {
 	defer connection.Close()
 
@@ -99,10 +101,10 @@ type command struct{ params []string }
 
 type camCommand struct{ command }
 
-type serverCommand struct{ command }
-
 type invalidCommand struct{ command }
 
+// camCommand.run send a command against the CamsPoolInstance
+// A camCommand must only provide a camera ID as an argument if needed
 func (com camCommand) run() (string, error) {
 	action := com.params[0]
 
@@ -134,6 +136,8 @@ func commandRunner(command commandInterface) (string, error) {
 	return command.run()
 }
 
+// parseCommand handles the command parsing.
+// A command must respect the following format: "SUBJECT-COMMAND-ARG"
 func parseCommand(input string) commandInterface {
 	commandArray := strings.Split(input, "-")
 

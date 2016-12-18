@@ -9,12 +9,14 @@ import (
 	"github.com/davidderus/dicam/config"
 )
 
-// CamsPool stores all started Cams
+// CamsPool stores all started Cams. It also allows easy access to the global
+// config
 type CamsPool struct {
 	cameras []*camera
 	config  *config.Config
 }
 
+// launchCamera assures a given camera setup and launch
 func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 	cam := &camera{ID: cameraID}
 	camOptions, cameraOptionsError := cp.config.GetCameraOptions(cameraID)
@@ -41,6 +43,8 @@ func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 	return fmt.Sprintf("Camera %s started with PID %d\n", cam.ID, cam.pid), nil
 }
 
+// listCameras return all the config cameras.
+// If the camera is running, its PID is also returned
 func (cp *CamsPool) listCameras() (string, error) {
 	cams := cp.cameras
 	message := "No camera"
@@ -67,11 +71,13 @@ func (cp *CamsPool) listCameras() (string, error) {
 	return message, nil
 }
 
+// inSlice indicates if a string is available in an array of strings
 func inSlice(needle string, haystack []string) bool {
 	index := sort.SearchStrings(haystack, needle)
 	return index < len(haystack)
 }
 
+// getCameraByID returns a Camera instance from the CamsPool
 func (cp *CamsPool) getCameraByID(cameraID string) (*camera, error) {
 	for _, cam := range cp.cameras {
 		if cam.ID == cameraID {
@@ -82,6 +88,7 @@ func (cp *CamsPool) getCameraByID(cameraID string) (*camera, error) {
 	return nil, fmt.Errorf("No camera %s found", cameraID)
 }
 
+// stopCamera stops a camera from the CamsPool
 func (cp *CamsPool) stopCamera(cameraID string) (string, error) {
 	cam, findError := cp.getCameraByID(cameraID)
 	if findError != nil {
@@ -96,8 +103,10 @@ func (cp *CamsPool) stopCamera(cameraID string) (string, error) {
 	return fmt.Sprintf("Camera %s stopped via PID %d\n", cameraID, cam.pid), nil
 }
 
-// @todo Improve message code logging
-// @todo Externalize logging too
+// boot initiates the CamsPool by launching all autostarting Cameras
+//
+// TODO Improve message code logging
+// TODO Externalize logging too
 func (cp *CamsPool) boot() {
 	camsToStart := cp.config.ListCamsToStart()
 
