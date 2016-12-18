@@ -118,6 +118,7 @@ func Init(version string) {
 				notifierEvent := notifier.Event{
 					CameraID:  cameraID,
 					EventType: eventType,
+					Config:    appConfig,
 				}
 
 				epochTime := c.Args().Get(2)

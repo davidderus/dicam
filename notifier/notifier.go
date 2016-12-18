@@ -8,6 +8,8 @@ import (
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/davidderus/dicam/config"
 )
 
 // Event is a motion at a given time with an optionnal attachment
@@ -15,6 +17,7 @@ type Event struct {
 	EventType string
 	CameraID  string
 	DateTime  time.Time
+	Config    *config.Config
 	eventFile EventFile
 }
 
@@ -64,32 +67,115 @@ func (e *Event) AddFile(filePath string, fileTypeBit int) {
 func (e *Event) Trigger() {
 	e.store()
 	e.startCountdown()
+	e.notify()
 }
 
 // Store logs the event in dicam database
 func (e *Event) store() {
-	println(e.EventType, "in", e.CameraID, "at", e.DateTime.Format(time.RFC1123))
+	// TODO Store event in database
 }
 
 // startCountdown waits for a given amount of seconds before sending a
 // notification
 func (e *Event) startCountdown() {
-	fmt.Printf("Sending notification in %d seconds\n", defaultWaitTime)
-	time.Sleep(defaultWaitTime * time.Second)
+	waitTime := e.Config.Countdown
 
-	if e.eventFile.filePath != "" {
-		fmt.Printf("With one %s: %s\n", e.eventFile.fileType, e.eventFile.filePath)
+	if waitTime == 0 {
+		waitTime = defaultWaitTime
 	}
 
-	e.notify()
+	log.Printf("Sending notification in %d seconds\n", waitTime)
+	time.Sleep(time.Duration(waitTime) * time.Second)
+
+	if e.eventFile.filePath != "" {
+		log.Printf("With one %s: %s\n", e.eventFile.fileType, e.eventFile.filePath)
+	}
 }
 
 // TODO Notify the user with a given string and file
 func (e *Event) notify() {
-	println("Notification sent!")
+	if len(e.Config.Notifiers) == 0 {
+		log.Fatalf("No notifiers in config, aborting")
+	}
+
+	notifierMessage := fmt.Sprintf("%s in %s at %s", e.EventType, e.CameraID, e.DateTime.Format(time.RFC1123))
+	log.Println(notifierMessage)
+
+	for _, notifierConfig := range e.Config.Notifiers {
+		var notifier notifierInterface
+
+		// Getting notifier
+		notifier, optionsError := getNotifier(notifierConfig.Service, notifierConfig.ServiceOptions)
+
+		if optionsError != nil {
+			// We do not use a Fatalf which could prevent execution of other notifiers
+			log.Printf("%s: %s", notifierConfig.Service, optionsError.Error())
+			continue
+		}
+
+		// Sending notification
+		notifyError := notifier.send(notifierMessage, notifierConfig.Recipients)
+
+		if notifyError != nil {
+			// We do not use a Fatalf which could prevent execution of other notifiers
+			log.Printf("%s: %s\n", notifierConfig.Service, notifyError.Error())
+			continue
+		}
+
+		log.Printf("Notification sent to %s recipients!\n", notifierConfig.Service)
+	}
 }
 
-// convertFileType convers a motion fileTypeBit to an understandable one
+type notifierInterface interface {
+	// send sends a message to a given set of recipients
+	send(message string, recipients []string) error
+
+	// setOptions defines configuration options for the notifier
+	setOptions(options map[string]string) error
+
+	// validateOptions validates the options given by setOptions and required by
+	// the notifier
+	validateOptions() error
+}
+
+type invalidNotifier struct{}
+
+func (notifier *invalidNotifier) send(message string, recipients []string) error {
+	return errors.New("Invalid notifier in config, no notification sent.")
+}
+
+func (notifier *invalidNotifier) setOptions(options map[string]string) error {
+	return nil
+}
+
+func (notifier *invalidNotifier) validateOptions() error {
+	return nil
+}
+
+func getNotifier(service string, options map[string]string) (notifierInterface, error) {
+	var notifier notifierInterface
+
+	switch service {
+	case "pushbullet", "push":
+		notifier = &PushbulletNotifier{}
+	case "email", "mail":
+		notifier = &EmailNotifier{}
+	default:
+		return &invalidNotifier{}, nil
+	}
+
+	notifierOptionsError := notifier.setOptions(options)
+
+	if notifierOptionsError != nil {
+		return notifier, notifierOptionsError
+	}
+
+	notifierValidationError := notifier.validateOptions()
+
+	return notifier, notifierValidationError
+}
+
+// convertFileType converts a motion fileTypeBit to an understandable one
 func convertFileType(fileTypeBit int) (string, error) {
 	knownFormats := map[int]string{
 		1:  "Normal picture",
