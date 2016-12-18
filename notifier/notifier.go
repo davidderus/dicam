@@ -104,14 +104,18 @@ func (e *Event) notify() {
 		notifier, optionsError := getNotifier(notifierConfig.Service, notifierConfig.ServiceOptions)
 
 		if optionsError != nil {
-			log.Fatalf("%s: %s", notifierConfig.Service, optionsError.Error())
+			// We do not use a Fatalf which could prevent execution of other notifiers
+			log.Printf("%s: %s", notifierConfig.Service, optionsError.Error())
+			continue
 		}
 
 		// Sending notification
 		notifyError := notifier.send("azerty", notifierConfig.Recipients)
 
 		if notifyError != nil {
-			log.Fatalf("%s: %s\n", notifierConfig.Service, notifyError.Error())
+			// We do not use a Fatalf which could prevent execution of other notifiers
+			log.Printf("%s: %s\n", notifierConfig.Service, notifyError.Error())
+			continue
 		}
 
 		log.Printf("Notification sent to %s recipients!\n", notifierConfig.Service)
