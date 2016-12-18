@@ -50,10 +50,14 @@ func CameraShow(w http.ResponseWriter, r *http.Request) {
 }
 
 func writeWithTemplate(response http.ResponseWriter, templateName string, templatePath string, data interface{}) {
+	getTemplateDirForFile := func(file string) string {
+		return filepath.Join("server", "templates", file)
+	}
+
 	templateFile, parseError := template.ParseFiles(
-		filepath.Join("server", "templates", "layout.html"),
-		filepath.Join("server", "templates", "navbar.html"),
-		filepath.Join("server", "templates", templatePath),
+		getTemplateDirForFile("layout.html"),
+		getTemplateDirForFile("navbar.html"),
+		getTemplateDirForFile(templatePath),
 	)
 
 	if parseError != nil {
