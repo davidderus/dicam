@@ -11,6 +11,7 @@ import (
 	"github.com/davidderus/dicam/config"
 	"github.com/davidderus/dicam/controller"
 	"github.com/davidderus/dicam/notifier"
+	"github.com/davidderus/dicam/server"
 
 	"github.com/urfave/cli"
 )
@@ -105,6 +106,7 @@ func Init(version string) {
 			Usage:   "Starts the webserver",
 			Action: func(c *cli.Context) error {
 				fmt.Println("Starting webserver")
+				server.Start()
 				return nil
 			},
 		},
