@@ -12,5 +12,7 @@ func CameraShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cameraID := vars["cameraId"]
 
+	// askClient("CAM-INFOS-" + cameraId)
+
 	writeWithTemplate(w, "CameraShow", filepath.Join("cameras", "show.html"), cameraID)
 }
