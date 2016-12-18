@@ -12,6 +12,10 @@
 			"ImportPath": "github.com/urfave/cli",
 			"Comment": "v1.18.0-67-gd53eb99",
 			"Rev": "d53eb991652b1d438abdd34ce4bfa3ef1539108e"
+		},
+		{
+			"ImportPath": "github.com/xconstruct/go-pushbullet",
+			"Rev": "7701de4be0964342739f6626906fe3678a23c0f0"
 		}
 	]
 }
