@@ -92,7 +92,7 @@ func (cp *CamsPool) getCameraByID(cameraID string) (*camera, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("No camera %s found", cameraID)
+	return nil, fmt.Errorf("No camera %s found running", cameraID)
 }
 
 // stopCamera stops a camera from the CamsPool
@@ -144,4 +144,16 @@ func (cp *CamsPool) boot() {
 			log.Printf("SUCCESS - %s", output)
 		}
 	}
+}
+
+// getCameraInfos returns useful informations about a camera
+func (cp *CamsPool) getCameraInfos(cameraID string) (string, error) {
+	cam, findError := cp.getCameraByID(cameraID)
+	if findError != nil {
+		return "", findError
+	}
+
+	infos := cam.infos()
+
+	return fmt.Sprintf(infos), nil
 }

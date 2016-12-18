@@ -19,6 +19,7 @@ const invalidCommandError = "Invalid command"
 const startAction = "START"
 const stopAction = "STOP"
 const listAction = "LIST"
+const infoAction = "INFOS"
 
 // CommandCenter stores the CommandCenter listener config
 type CommandCenter struct {
@@ -123,6 +124,8 @@ func (com camCommand) run() (string, error) {
 		return CamsPoolInstance.stopCamera(id)
 	case listAction:
 		return CamsPoolInstance.listCameras()
+	case infoAction:
+		return CamsPoolInstance.getCameraInfos(id)
 	}
 
 	return "", errors.New(invalidCommandError)

@@ -143,10 +143,24 @@ func (c *camera) stop() error {
 	return nil
 }
 
-func (c camera) isRunning() bool {
+func (c *camera) isRunning() bool {
 	return c.pid > 0
 }
 
 func (c camera) teardown() {
 	os.Remove(c.configFile)
+}
+
+func (c *camera) infos() string {
+	infosTemplate := "DEVICE:%s\nROLE:%s\nPID:%d\nPORT:%d\nLOG:%s\nCONFIG:%s"
+
+	return fmt.Sprintf(
+		infosTemplate,
+		c.ID,
+		c.UserOptions.Role,
+		c.pid,
+		c.StreamPort,
+		c.logFile,
+		c.configFile,
+	)
 }

@@ -98,6 +98,14 @@ func Init(version string) {
 						return nil
 					},
 				},
+				{
+					Name:   "infos",
+					Hidden: true,
+					Action: func(c *cli.Context) error {
+						client.Ask("CAM-INFOS-" + c.Args().First())
+						return nil
+					},
+				},
 			},
 		},
 		{
