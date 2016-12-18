@@ -64,7 +64,7 @@ countdown = 30 # In seconds, default to 10
   role = "stream" # No notifications. Only streaming.
 
 [notifiers]
-  [notifiers.main_mail]
+  [notifiers.emailer]
     service = "email"
     recipients = [ "test@test.com" ]
     [notifiers.emailer.options]
@@ -114,7 +114,7 @@ TODO
 
 ```toml
 [notifiers]
-  [notifiers.push]
+  [notifiers.pushbullet]
     service = "push"
     recipients = [ "MYDEVICEID" ]
     [notifiers.pushbullet.options]
