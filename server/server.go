@@ -1,9 +1,11 @@
 package server
 
 import (
-	"fmt"
+	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -32,12 +34,12 @@ func Start() {
 
 // HomeIndex gives dicam status infos
 func HomeIndex(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Index")
+	writeWithTemplate(w, "HomeIndex", filepath.Join("index.html"), nil)
 }
 
 // CameraIndex lists all cameras
 func CameraIndex(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Cameras index")
+	writeWithTemplate(w, "CameraIndex", filepath.Join("cameras", "index.html"), nil)
 }
 
 // CameraShow shows a given camera
@@ -45,5 +47,19 @@ func CameraShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cameraID := vars["cameraId"]
 
-	fmt.Fprintln(w, "Showing camera "+cameraID)
+	writeWithTemplate(w, "CameraShow", filepath.Join("cameras", "show.html"), cameraID)
+}
+
+func writeWithTemplate(response http.ResponseWriter, templateName string, templatePath string, data interface{}) {
+	currentDir, _ := os.Getwd()
+	templateFile, parseError := template.ParseFiles(
+		filepath.Join(currentDir, "server", "templates", "layout.html"),
+		filepath.Join(currentDir, "server", "templates", templatePath),
+	)
+
+	if parseError != nil {
+		log.Fatalf("Can't parse template for %s", templateName)
+	}
+
+	templateFile.ExecuteTemplate(response, "layout", data)
 }

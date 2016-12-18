@@ -105,7 +105,7 @@ func Init(version string) {
 			Aliases: []string{"s"},
 			Usage:   "Starts the webserver",
 			Action: func(c *cli.Context) error {
-				fmt.Println("Starting webserver")
+				fmt.Println("Starting webserver on port 8000")
 				server.Start()
 				return nil
 			},
