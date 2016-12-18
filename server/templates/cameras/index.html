@@ -2,4 +2,8 @@
 
 <h1>Cameras</h1>
 
+{{ range $key, $value := . }}
+   <li>{{ $value }}</li>
+{{ end }}
+
 {{ end }}
