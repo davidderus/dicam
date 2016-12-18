@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/davidderus/dicam/client"
 	"github.com/davidderus/dicam/config"
 	"github.com/davidderus/dicam/controller"
 	"github.com/davidderus/dicam/notifier"
@@ -17,8 +18,8 @@ import (
 )
 
 // getClient creates a new client to send command to the CommandCenter
-func getClient(config *config.Config) *Client {
-	client := &Client{Host: config.Host, Port: config.Port}
+func getClient(config *config.Config) *client.Client {
+	client := &client.Client{Host: config.Host, Port: config.Port}
 	connectionError := client.Connect()
 
 	if connectionError != nil {
@@ -40,7 +41,7 @@ func loadConfig() *config.Config {
 
 // Init starts Dicam command line interface
 func Init(version string) {
-	var client *Client
+	var client *client.Client
 
 	appConfig := loadConfig()
 
