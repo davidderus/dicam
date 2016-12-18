@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -51,10 +50,10 @@ func CameraShow(w http.ResponseWriter, r *http.Request) {
 }
 
 func writeWithTemplate(response http.ResponseWriter, templateName string, templatePath string, data interface{}) {
-	currentDir, _ := os.Getwd()
 	templateFile, parseError := template.ParseFiles(
-		filepath.Join(currentDir, "server", "templates", "layout.html"),
-		filepath.Join(currentDir, "server", "templates", templatePath),
+		filepath.Join("server", "templates", "layout.html"),
+		filepath.Join("server", "templates", "navbar.html"),
+		filepath.Join("server", "templates", templatePath),
 	)
 
 	if parseError != nil {
