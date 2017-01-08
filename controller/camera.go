@@ -37,9 +37,9 @@ func (c *camera) setStreamPort(streamPort int) {
 	c.StreamPort = streamPort
 }
 
-// getNotifierPath gets the binary current path in order to launch watchers
+// getNotifierPath gets the absolute path to the dicam binary in order to launch watchers
 func (c *camera) getNotifierPath() error {
-	appDir, appDirError := filepath.Abs(filepath.Dir(os.Args[0]))
+	appDir, appDirError := filepath.Abs(os.Args[0])
 	if appDirError != nil {
 		return appDirError
 	}
