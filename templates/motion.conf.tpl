@@ -495,9 +495,12 @@ on_event_start {{.NotifierPath}} notifier {{.ID}} eventStart %s
 # (default: none). The period of no motion is defined by option gap.
 on_event_end {{.NotifierPath}} notifier {{.ID}} eventEnd %s
 
+# dicam is not notifying on picture save for now to prevent notification spam,
+# but may store/queue the event on a future release
+#
 # Command to be executed when a picture (.ppm|.jpg) is saved (default: none)
 # To give the filename as an argument to a command append it with %f
-on_picture_save {{.NotifierPath}} notifier {{.ID}} pictureSave %s "%f" %n
+# on_picture_save {{.NotifierPath}} notifier {{.ID}} pictureSave %s "%f" %n
 {{end}}
 
 # Command to be executed when a motion frame is detected (default: none)
