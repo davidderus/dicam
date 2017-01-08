@@ -47,7 +47,7 @@ func (cp *CamsPool) launchCamera(cameraID string) (string, error) {
 
 	cp.cameras = append(cp.cameras, cam)
 
-	return fmt.Sprintf("Camera %s started with PID %d\n", cam.ID, cam.pid), nil
+	return fmt.Sprintf("Camera %s started with PID %d", cam.ID, cam.pid), nil
 }
 
 // listCameras return all the config cameras.
@@ -111,7 +111,23 @@ func (cp *CamsPool) stopCamera(cameraID string) (string, error) {
 		return "", err
 	}
 
-	return fmt.Sprintf("Camera %s stopped via PID %d\n", cameraID, camOldPID), nil
+	cp.removeCamera(cameraID)
+
+	return fmt.Sprintf("Camera %s stopped via PID %d", cameraID, camOldPID), nil
+}
+
+func (cp *CamsPool) removeCamera(cameraID string) {
+	newCamerasList := []*camera{}
+
+	for _, cam := range cp.cameras {
+		if cam.ID == cameraID {
+			continue
+		}
+
+		newCamerasList = append(newCamerasList, cam)
+	}
+
+	cp.cameras = newCamerasList
 }
 
 func (cp *CamsPool) allocateStreamPort(cameraID string) int {
