@@ -80,8 +80,10 @@ func (cp *CamsPool) listCameras() (string, error) {
 
 // inSlice indicates if a string is available in an array of strings
 func inSlice(needle string, haystack []string) bool {
+	sort.Strings(haystack)
 	index := sort.SearchStrings(haystack, needle)
-	return index < len(haystack)
+
+	return (index < len(haystack) && haystack[index] == needle)
 }
 
 // getCameraByID returns a Camera instance from the CamsPool
