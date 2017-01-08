@@ -104,12 +104,14 @@ func (cp *CamsPool) stopCamera(cameraID string) (string, error) {
 		return "", findError
 	}
 
+	camOldPID := cam.pid
+
 	err := cam.stop()
 	if err != nil {
 		return "", err
 	}
 
-	return fmt.Sprintf("Camera %s stopped via PID %d\n", cameraID, cam.pid), nil
+	return fmt.Sprintf("Camera %s stopped via PID %d\n", cameraID, camOldPID), nil
 }
 
 func (cp *CamsPool) allocateStreamPort(cameraID string) int {
