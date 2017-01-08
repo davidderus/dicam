@@ -48,7 +48,7 @@ func (c *Client) Ask(command string) (string, error) {
 			return fmt.Sprintf("%s: %s", response[0], response[1]), nil
 		}
 
-		return "", errors.New(fmt.Sprintln(response[1]))
+		return fmt.Sprint(response[1]), nil
 	}
 
 	return "", errors.New(fmt.Sprintln("Unknown response from command center"))
