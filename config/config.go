@@ -18,6 +18,9 @@ type CameraOptions struct {
 	// Device address like /dev/video0
 	Device string
 
+	// Custom input (default is 8)
+	Input int
+
 	// Basic Motion options
 	Width     int
 	Height    int

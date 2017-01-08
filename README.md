@@ -61,6 +61,7 @@ countdown = 30 # In seconds, default to 10
   [cameras.dorms]
   auto_start = false
   device = "/dev/video1"
+  input = -1 # Custom input handling
   role = "stream" # No notifications. Only streaming.
 
 [notifiers]

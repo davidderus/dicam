@@ -33,9 +33,11 @@ v4l2_palette 8
 # This is ONLY used for FreeBSD. Leave it commented out for Linux
 ; tunerdevice /dev/tuner0
 
+{{with .UserOptions.Input}}
 # The video input to be used (default: 8)
 # Should normally be set to 0 or 1 for video/TV cards, and 8 for USB cameras
-input 8
+input {{.}}
+{{end}}
 
 # The video norm to use (only for video capture and TV tuner cards)
 # Values: 0 (PAL), 1 (NTSC), 2 (SECAM), 3 (PAL NC no colour). Default: 0 (PAL)
