@@ -4,32 +4,34 @@
 
 <div class="row">
   <div class="col-md-8">
-    <img src="http://localhost:{{ index .ViewData "PORT" }}" width="640" height="480" class="img-responsive"></img>
+    <img src="{{ if .ViewData.PID }}http://localhost:{{ .ViewData.PORT }}{{ end }}" width="640" height="480" class="img-responsive"></img>
   </div>
   <div class="col-md-4">
+    {{ if .ViewData.PID }}
     <h3>Informations</h3>
     <dl class="dl-horizontal">
       <dt>Role</dt>
       <dd><span class="label label-primary">{{ index .ViewData "ROLE" }}</span></dd>
       <dt>Port</dt>
-      <dd>{{ index .ViewData "PORT" }}</dd>
+      <dd>{{ .ViewData.PORT }}</dd>
       <dt>PID</dt>
-      <dd>{{ index .ViewData "PID" }}</dd>
+      <dd>{{ .ViewData.PID }}</dd>
       <dt>Log File</dt>
-      <dd>{{ index .ViewData "LOG" }}</dd>
+      <dd>{{ .ViewData.LOG }}</dd>
       <dt>Config file</dt>
-      <dd>{{ index .ViewData "CONFIG" }}</dd>
+      <dd>{{ .ViewData.CONFIG }}</dd>
     </dl>
 
     <br>
+    {{ end }}
 
     <h3>Commands</h3>
 
     <div>
-      {{ if .ViewData.ROLE }}
-      <a href="/cameras/{{ index .ViewData "DEVICE" }}/stop" class="btn btn-danger btn-block">Stop</a>
+      {{ if .ViewData.PID }}
+      <a href="/cameras/{{ .ViewData.DEVICE }}/stop" class="btn btn-danger btn-block">Stop</a>
       {{ else }}
-      <a href="/cameras/{{ index .ViewData "DEVICE" }}/start" class="btn btn-success btn-block">Start</a>
+      <a href="/cameras/{{ .ViewData.DEVICE }}/start" class="btn btn-success btn-block">Start</a>
       {{ end }}
     </div>
   </div>
