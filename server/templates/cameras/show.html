@@ -7,6 +7,7 @@
     <iframe src="http://localhost:{{ index . "PORT" }}" width="640" height="480"></iframe>
   </div>
   <div class="col-md-4">
+    <h3>Informations</h3>
     <dl class="dl-horizontal">
       <dt>Role</dt>
       <dd><span class="label label-primary">{{ index . "ROLE" }}</span></dd>
@@ -19,6 +20,15 @@
       <dt>Config file</dt>
       <dd>{{ index . "CONFIG" }}</dd>
     </dl>
+
+    <br>
+
+    <h3>Commands</h3>
+
+    <div>
+      <a href="/cameras/{{ index . "DEVICE" }}/start" class="btn btn-success btn-block">Start</a>
+      <a href="/cameras/{{ index . "DEVICE" }}/stop" class="btn btn-danger btn-block">Stop</a>
+    </div>
   </div>
 </div>
 
