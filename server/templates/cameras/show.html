@@ -1,5 +1,26 @@
 {{ define "content" }}
 
-<h1>Camera {{ . }}</h1>
+<h1>Camera {{ index . "DEVICE" }}</h1>
+
+<div class="row">
+  <div class="col-md-8">
+    <iframe src="http://localhost:{{ index . "PORT" }}" width="640" height="480"></iframe>
+  </div>
+  <div class="col-md-4">
+    <dl class="dl-horizontal">
+      <dt>Role</dt>
+      <dd><span class="label label-primary">{{ index . "ROLE" }}</span></dd>
+      <dt>Port</dt>
+      <dd>{{ index . "PORT" }}</dd>
+      <dt>PID</dt>
+      <dd>{{ index . "PID" }}</dd>
+      <dt>Log File</dt>
+      <dd>{{ index . "LOG" }}</dd>
+      <dt>Config file</dt>
+      <dd>{{ index . "CONFIG" }}</dd>
+    </dl>
+  </div>
+</div>
+
 
 {{ end }}
