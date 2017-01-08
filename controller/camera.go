@@ -17,13 +17,16 @@ import (
 // optionnal PID if it is started
 type camera struct {
 	ID           string
-	pid          int
 	StreamPort   int
-	configFile   string
-	logFile      string
-	workingDir   string
+	CapturesDir  string
 	NotifierPath string
 	UserOptions  *config.CameraOptions
+
+	pid int
+
+	workingDir string
+	configFile string
+	logFile    string
 }
 
 func (c *camera) setWorkingDir(directory string) {
@@ -91,11 +94,18 @@ func (c *camera) buildConfig() error {
 	threadName := fmt.Sprintf(config.ThreadBaseName, c.ID)
 	c.configFile = path.Join(c.workingDir, config.ConfigDirectoryName, threadName+".conf")
 	c.logFile = path.Join(c.workingDir, config.LogsDirectoryName, threadName+".log")
+	c.CapturesDir = path.Join(c.workingDir, config.CapturesDirectoryName, threadName)
 
 	// Read from default template
 	template, parseError := template.ParseFiles(mainConfigPath)
 	if parseError != nil {
 		return errors.New("Can not read nor parse main config template: " + parseError.Error())
+	}
+
+	// Ensure that captures directory exists
+	mkdirCamCapturesDir := os.MkdirAll(c.CapturesDir, 0700)
+	if mkdirCamCapturesDir != nil {
+		return errors.New("Can not create captures storage directory")
 	}
 
 	// Execute config options against template

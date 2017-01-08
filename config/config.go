@@ -81,6 +81,9 @@ const ConfigDirectoryName = "configs"
 // LogsDirectoryName is the name for the directory where the motion logs are stored
 const LogsDirectoryName = "logs"
 
+// CapturesDirectoryName is the main folder where all the pictures and videos are saved
+const CapturesDirectoryName = "captures"
+
 // MainConfigFileTemplate is the default motion config
 const MainConfigFileTemplate = "motion.conf.tpl"
 
@@ -158,6 +161,11 @@ func (c *Config) populateWorkingDir() error {
 	mkdirLogsError := os.MkdirAll(path.Join(c.WorkingDir, LogsDirectoryName), DefaultConfigMode)
 	if mkdirLogsError != nil {
 		return mkdirLogsError
+	}
+
+	mkdirCapturesError := os.MkdirAll(path.Join(c.WorkingDir, CapturesDirectoryName), DefaultConfigMode)
+	if mkdirCapturesError != nil {
+		return mkdirCapturesError
 	}
 
 	return nil

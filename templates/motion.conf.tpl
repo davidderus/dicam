@@ -350,7 +350,7 @@ text_double off
 
 # Target base directory for pictures and films
 # Recommended to use absolute path. (Default: current working directory)
-target_dir /usr/local/apache2/htdocs/cam1
+target_dir {{ .CapturesDir }}
 
 # File path for snapshots (jpeg or ppm) relative to target_dir
 # Default: %v-%Y%m%d%H%M%S-snapshot
