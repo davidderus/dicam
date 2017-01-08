@@ -12,7 +12,7 @@ import (
 type Client struct {
 	Host   string
 	Port   int
-	sender net.Conn
+	sender *net.Conn
 }
 
 // Connect opens a tcp channel to the CommandCenter
@@ -29,16 +29,16 @@ func (c *Client) Connect() error {
 		return dialError
 	}
 
-	c.sender = sender
+	c.sender = &sender
 
 	return nil
 }
 
 // Ask sends a request to the CommandCenter and returns its response
 func (c *Client) Ask(command string) (string, error) {
-	fmt.Fprintf(c.sender, command+"\r")
+	fmt.Fprintf(*c.sender, command+"\r")
 
-	output, _ := bufio.NewReader(c.sender).ReadString('\r')
+	output, _ := bufio.NewReader(*c.sender).ReadString('\r')
 	output = strings.TrimRight(string(output), "\r")
 
 	response := strings.SplitN(output, "-", 2)
