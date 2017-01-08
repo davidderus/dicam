@@ -16,6 +16,7 @@ func CameraShow(w http.ResponseWriter, r *http.Request) {
 	cameraRawInfos := askClient("CAM-INFOS-" + cameraID)
 	cameraInfos := map[string]string{}
 
+	cameraInfos["ID"] = cameraID
 	for _, infosLine := range strings.Split(cameraRawInfos, "\n") {
 		infos := strings.Split(infosLine, ":")
 

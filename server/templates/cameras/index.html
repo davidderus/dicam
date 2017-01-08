@@ -3,10 +3,14 @@
 <h1>Cameras</h1>
 
 <ul class="list-unstyled">
-  {{ range $key, $value := . }}
+  {{ range $key, $camera := .ViewData }}
   <li>
-    <h4>{{ $value }}</h4>
-    <a href="/cameras/{{ $value }}" class="btn btn-default btn-sm">See</a>
+    {{ if $camera.Active }}
+    <img src="http://localhost:{{ $camera.Port }}" width="320" height="240" class="img-responsive"></img>
+    {{ end }}
+
+    <h4>Camera {{ $camera.ID }}</h4>
+    <a href="/cameras/{{ $camera.ID }}" class="btn btn-default btn-sm">See</a>
   </li>
   {{ end }}
 </ul>

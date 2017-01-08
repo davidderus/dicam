@@ -20,8 +20,11 @@
           <ul class="dropdown-menu">
             <li><a href="/cameras">All</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="/cameras/livingroom">livingroom</a></li>
-            <li><a href="/cameras/dressroom">dressroom</a></li>
+            {{ range $key, $camera := .LayoutData.CamerasListing }}
+            <li>
+              <a href="/cameras/{{ $camera.ID }}">{{ $camera.ID }}</a>
+            </li>
+            {{ end }}
           </ul>
         </li>
       </ul>

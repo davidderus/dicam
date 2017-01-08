@@ -1,24 +1,24 @@
 {{ define "content" }}
 
-<h1>Camera {{ index . "DEVICE" }}</h1>
+<h1>Camera {{ index .ViewData "ID" }}</h1>
 
 <div class="row">
   <div class="col-md-8">
-    <img src="http://localhost:{{ index . "PORT" }}" width="640" height="480" class="img-responsive"></img>
+    <img src="http://localhost:{{ index .ViewData "PORT" }}" width="640" height="480" class="img-responsive"></img>
   </div>
   <div class="col-md-4">
     <h3>Informations</h3>
     <dl class="dl-horizontal">
       <dt>Role</dt>
-      <dd><span class="label label-primary">{{ index . "ROLE" }}</span></dd>
+      <dd><span class="label label-primary">{{ index .ViewData "ROLE" }}</span></dd>
       <dt>Port</dt>
-      <dd>{{ index . "PORT" }}</dd>
+      <dd>{{ index .ViewData "PORT" }}</dd>
       <dt>PID</dt>
-      <dd>{{ index . "PID" }}</dd>
+      <dd>{{ index .ViewData "PID" }}</dd>
       <dt>Log File</dt>
-      <dd>{{ index . "LOG" }}</dd>
+      <dd>{{ index .ViewData "LOG" }}</dd>
       <dt>Config file</dt>
-      <dd>{{ index . "CONFIG" }}</dd>
+      <dd>{{ index .ViewData "CONFIG" }}</dd>
     </dl>
 
     <br>
@@ -26,8 +26,8 @@
     <h3>Commands</h3>
 
     <div>
-      <a href="/cameras/{{ index . "DEVICE" }}/start" class="btn btn-success btn-block">Start</a>
-      <a href="/cameras/{{ index . "DEVICE" }}/stop" class="btn btn-danger btn-block">Stop</a>
+      <a href="/cameras/{{ index .ViewData "DEVICE" }}/start" class="btn btn-success btn-block">Start</a>
+      <a href="/cameras/{{ index .ViewData "DEVICE" }}/stop" class="btn btn-danger btn-block">Stop</a>
     </div>
   </div>
 </div>
