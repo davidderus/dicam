@@ -60,7 +60,7 @@ func (cp *CamsPool) listCameras() (string, error) {
 
 	// Listing running cams first
 	for _, runningCam := range cams {
-		camsList = append(camsList, fmt.Sprintf("Cam. %s - PID %d", runningCam.ID, runningCam.pid))
+		camsList = append(camsList, fmt.Sprintf("Cam. %s - PID %d - Port %d", runningCam.ID, runningCam.pid, runningCam.StreamPort))
 		camIDS = append(camIDS, runningCam.ID)
 	}
 
@@ -68,7 +68,7 @@ func (cp *CamsPool) listCameras() (string, error) {
 		if inSlice(camName, camIDS) {
 			continue
 		}
-		camsList = append(camsList, fmt.Sprintf("Cam. %s - Not running", camName))
+		camsList = append(camsList, fmt.Sprintf("Cam. %s - Not running - No port", camName))
 	}
 
 	if len(camsList) > 0 {

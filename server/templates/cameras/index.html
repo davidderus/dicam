@@ -2,8 +2,13 @@
 
 <h1>Cameras</h1>
 
-{{ range $key, $value := . }}
-   <li>{{ $value }}</li>
-{{ end }}
+<ul class="list-unstyled">
+  {{ range $key, $value := . }}
+  <li>
+    <h4>{{ $value }}</h4>
+    <a href="/cameras/{{ $value }}" class="btn btn-default btn-sm">See</a>
+  </li>
+  {{ end }}
+</ul>
 
 {{ end }}
