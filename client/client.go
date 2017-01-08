@@ -46,12 +46,12 @@ func (c *Client) Ask(command string) (string, error) {
 	if len(response) > 1 {
 		if response[0] != "SUCCESS" {
 			return fmt.Sprintf("%s: %s", response[0], response[1]), nil
-		} else {
-			return "", errors.New(fmt.Sprintln(response[1]))
 		}
-	} else {
-		return "", errors.New(fmt.Sprintln("Unknown response from command center"))
+
+		return "", errors.New(fmt.Sprintln(response[1]))
 	}
+
+	return "", errors.New(fmt.Sprintln("Unknown response from command center"))
 }
 
 // Print logs the response of the command center

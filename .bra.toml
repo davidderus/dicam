@@ -5,6 +5,7 @@ init_cmds = [
 ]									# Commands run in start
 watch_all = true					# Watch all sub-directories
 watch_dirs = [
+	"$WORKDIR/client",
 	"$WORKDIR/controller",
 	"$WORKDIR/config",
 	"$WORKDIR/cli",
