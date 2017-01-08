@@ -32,11 +32,12 @@ func getCameras() map[string]*smallCamera {
 		infos := strings.Split(infosLine, " - ")
 
 		key := strings.Replace(infos[0], "Cam. ", "", 1)
+
 		isActive := infos[1] != "Not running"
 
 		port := ""
 		if isActive {
-			port = strings.Replace(infos[0], "Port ", "", 1)
+			port = strings.Replace(infos[2], "Port ", "", 1)
 		}
 
 		camerasList[key] = &smallCamera{ID: key, Port: port, Active: isActive}
