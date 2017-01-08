@@ -1,10 +1,8 @@
 package server
 
 import (
-	"html/template"
 	"log"
 	"net/http"
-	"path/filepath"
 	"time"
 
 	"github.com/davidderus/dicam/client"
@@ -37,22 +35,14 @@ func Start() {
 	log.Fatal(server.ListenAndServe())
 }
 
-func writeWithTemplate(response http.ResponseWriter, templateName string, templatePath string, data interface{}) {
-	getTemplateDirForFile := func(file string) string {
-		return filepath.Join("server", "templates", file)
+// loadConfig reads the dicam config file
+func loadConfig() *config.Config {
+	config, readError := config.Read()
+	if readError != nil {
+		log.Fatalln(readError)
 	}
 
-	templateFile, parseError := template.ParseFiles(
-		getTemplateDirForFile("layout.html"),
-		getTemplateDirForFile("navbar.html"),
-		getTemplateDirForFile(templatePath),
-	)
-
-	if parseError != nil {
-		log.Fatalf("Can't parse template for %s", templateName)
-	}
-
-	templateFile.ExecuteTemplate(response, "layout", data)
+	return config
 }
 
 // askClient interacts once with the command center
@@ -67,14 +57,4 @@ func askClient(command string) string {
 
 	askResponse, _ := client.Ask(command)
 	return askResponse
-}
-
-// loadConfig reads the dicam config file
-func loadConfig() *config.Config {
-	config, readError := config.Read()
-	if readError != nil {
-		log.Fatalln(readError)
-	}
-
-	return config
 }
