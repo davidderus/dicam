@@ -391,27 +391,27 @@ timelapse_filename %Y%m%d-timelapse
 ############################################################
 
 # The mini-http server listens to this port for requests (default: 0 = disabled)
-webcam_port {{ .StreamPort }}
+stream_port {{ .StreamPort }}
 
 # Quality of the jpeg (in percent) images produced (default: 50)
-webcam_quality 50
+stream_quality 50
 
 # Output frames at 1 fps when no motion is detected and increase to the
 # rate given by webcam_maxrate when motion is detected (default: off)
-webcam_motion off
+stream_motion off
 
 # Maximum framerate for webcam streams (default: 1)
-webcam_maxrate 1
+stream_maxrate 1
 
 {{if eq .UserOptions.Role "stream"}}
 # Restrict webcam connections to localhost only (default: on)
-webcam_localhost off
+stream_localhost off
 {{end}}
 
 # Limits the number of images per connection (default: 0 = unlimited)
 # Number can be defined by multiplying actual webcam rate by desired number of seconds
 # Actual webcam rate is the smallest of the numbers framerate and webcam_maxrate
-webcam_limit 0
+stream_limit 0
 
 
 ############################################################
