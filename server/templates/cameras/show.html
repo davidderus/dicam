@@ -26,8 +26,11 @@
     <h3>Commands</h3>
 
     <div>
-      <a href="/cameras/{{ index .ViewData "DEVICE" }}/start" class="btn btn-success btn-block">Start</a>
+      {{ if .ViewData.ROLE }}
       <a href="/cameras/{{ index .ViewData "DEVICE" }}/stop" class="btn btn-danger btn-block">Stop</a>
+      {{ else }}
+      <a href="/cameras/{{ index .ViewData "DEVICE" }}/start" class="btn btn-success btn-block">Start</a>
+      {{ end }}
     </div>
   </div>
 </div>
