@@ -4,7 +4,11 @@
 
 <div class="row">
   <div class="col-md-8">
-    <img src="{{ if .ViewData.PID }}http://localhost:{{ .ViewData.PORT }}{{ end }}" width="640" height="480" class="img-responsive"></img>
+    {{ if .ViewData.PID }}
+      <img src="http://localhost:{{ .ViewData.PORT }}" width="640" height="480" class="img-responsive"></img>
+    {{ else }}
+      <div class="camera--placeholder">Camera is stopped</div>
+    {{ end }}
   </div>
   <div class="col-md-4">
     {{ if .ViewData.PID }}

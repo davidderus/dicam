@@ -15,7 +15,7 @@
       <div class="caption">
         <h4>Camera {{ $camera.ID }}</h4>
 
-        <a href="/cameras/{{ $camera.ID }}" class="btn btn-default btn-sm">See</a>
+        <a href="/cameras/{{ $camera.ID }}" class="btn btn-default btn-sm">View</a>
         {{ if $camera.Active }}
         <a href="/cameras/{{ $camera.ID }}/stop" class="btn btn-danger btn-sm">Stop</a>
         {{ else }}
