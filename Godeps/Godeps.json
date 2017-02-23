@@ -1,12 +1,17 @@
 {
 	"ImportPath": "github.com/davidderus/dicam",
-	"GoVersion": "go1.7",
+	"GoVersion": "go1.8",
 	"GodepVersion": "v74",
 	"Deps": [
 		{
 			"ImportPath": "github.com/BurntSushi/toml",
 			"Comment": "v0.2.0-21-g9906417",
 			"Rev": "99064174e013895bbd9b025c31100bd1d9b590ca"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.1-27-g757bef9",
+			"Rev": "757bef944d0f21880861c2dd9c871ca543023cba"
 		},
 		{
 			"ImportPath": "github.com/urfave/cli",

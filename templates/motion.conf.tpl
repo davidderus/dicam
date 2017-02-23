@@ -33,9 +33,11 @@ v4l2_palette 8
 # This is ONLY used for FreeBSD. Leave it commented out for Linux
 ; tunerdevice /dev/tuner0
 
+{{with .UserOptions.Input}}
 # The video input to be used (default: 8)
 # Should normally be set to 0 or 1 for video/TV cards, and 8 for USB cameras
-input 8
+input {{.}}
+{{end}}
 
 # The video norm to use (only for video capture and TV tuner cards)
 # Values: 0 (PAL), 1 (NTSC), 2 (SECAM), 3 (PAL NC no colour). Default: 0 (PAL)
@@ -348,7 +350,7 @@ text_double off
 
 # Target base directory for pictures and films
 # Recommended to use absolute path. (Default: current working directory)
-target_dir /usr/local/apache2/htdocs/cam1
+target_dir {{ .CapturesDir }}
 
 # File path for snapshots (jpeg or ppm) relative to target_dir
 # Default: %v-%Y%m%d%H%M%S-snapshot
@@ -388,28 +390,28 @@ timelapse_filename %Y%m%d-timelapse
 # Live Webcam Server
 ############################################################
 
-{{if eq .UserOptions.Role "stream"}}
 # The mini-http server listens to this port for requests (default: 0 = disabled)
-webcam_port 8081
-{{end}}
+stream_port {{ .StreamPort }}
 
 # Quality of the jpeg (in percent) images produced (default: 50)
-webcam_quality 50
+stream_quality 50
 
 # Output frames at 1 fps when no motion is detected and increase to the
 # rate given by webcam_maxrate when motion is detected (default: off)
-webcam_motion off
+stream_motion off
 
 # Maximum framerate for webcam streams (default: 1)
-webcam_maxrate 1
+stream_maxrate 1
 
+{{if eq .UserOptions.Role "stream"}}
 # Restrict webcam connections to localhost only (default: on)
-webcam_localhost on
+stream_localhost off
+{{end}}
 
 # Limits the number of images per connection (default: 0 = unlimited)
 # Number can be defined by multiplying actual webcam rate by desired number of seconds
 # Actual webcam rate is the smallest of the numbers framerate and webcam_maxrate
-webcam_limit 0
+stream_limit 0
 
 
 ############################################################
@@ -493,9 +495,12 @@ on_event_start {{.NotifierPath}} notifier {{.ID}} eventStart %s
 # (default: none). The period of no motion is defined by option gap.
 on_event_end {{.NotifierPath}} notifier {{.ID}} eventEnd %s
 
+# dicam is not notifying on picture save for now to prevent notification spam,
+# but may store/queue the event on a future release
+#
 # Command to be executed when a picture (.ppm|.jpg) is saved (default: none)
 # To give the filename as an argument to a command append it with %f
-on_picture_save {{.NotifierPath}} notifier {{.ID}} pictureSave %s "%f" %n
+# on_picture_save {{.NotifierPath}} notifier {{.ID}} pictureSave %s "%f" %n
 {{end}}
 
 # Command to be executed when a motion frame is detected (default: none)

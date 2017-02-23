@@ -1,0 +1,24 @@
+{{ define "layout" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dicam</title>
+  <meta name="viewport" content="width=device-width">
+  <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.7/superhero/bootstrap.min.css" rel="stylesheet" integrity="sha384-Xqcy5ttufkC3rBa8EdiAyA1VgOGrmel2Y+wxm4K3kI3fcjTWlDWrlnxyD6hOi3PF" crossorigin="anonymous">
+  <style media="screen">
+    .camera-thumbnail { width: 100%; height: 264px }
+    .camera--placeholder { width: 640px; height: 480px; background-color: #4e5d6c; text-align: center; line-height: 480px }
+  </style>
+</head>
+<body>
+  {{ template "navbar" . }}
+  <div class="container">
+    {{ template "content" . }}
+  </div>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>
+{{ end }}

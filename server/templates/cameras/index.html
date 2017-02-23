@@ -1,0 +1,30 @@
+{{ define "content" }}
+
+<h1>Cameras</h1>
+
+<div class="row">
+  {{ range $key, $camera := .ViewData }}
+  <div class="col-sm-4">
+    <div class="thumbnail">
+      <div class="camera-thumbnail">
+        {{ if $camera.Active }}
+        <img src="http://localhost:{{ $camera.Port }}" width="640" height="480" class="img-responsive"></img>
+        {{ end }}
+      </div>
+
+      <div class="caption">
+        <h4>Camera {{ $camera.ID }}</h4>
+
+        <a href="/cameras/{{ $camera.ID }}" class="btn btn-default btn-sm">View</a>
+        {{ if $camera.Active }}
+        <a href="/cameras/{{ $camera.ID }}/stop" class="btn btn-danger btn-sm">Stop</a>
+        {{ else }}
+        <a href="/cameras/{{ $camera.ID }}/start" class="btn btn-success btn-sm">Start</a>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+  {{ end }}
+</div>
+
+{{ end }}

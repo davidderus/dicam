@@ -61,6 +61,7 @@ countdown = 30 # In seconds, default to 10
   [cameras.dorms]
   auto_start = false
   device = "/dev/video1"
+  input = -1 # Custom input handling
   role = "stream" # No notifications. Only streaming.
 
 [notifiers]
@@ -106,11 +107,17 @@ dicam cam list
 
 #### D. Live streams
 
-TODO
+Dicam embeds a webserver which allows you to control your cameras and watch their
+streams in real time.
 
-## Other notifiers
+To start the webserver, run `dicam webserver`.
 
-### Pushbullet
+Then, you can access [127.0.0.1:8000]() and browse your cameras through the
+web interface.
+
+#### E. Add other notifiers
+
+##### Pushbullet
 
 ```toml
 [notifiers]
