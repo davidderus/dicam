@@ -21,7 +21,7 @@ func CameraStart(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, camStartError)
 	} else {
 		// Waiting for motion to make the camera available
-		time.Sleep(750 * time.Millisecond)
+		time.Sleep(1 * time.Second)
 
 		http.Redirect(w, r, "/cameras/"+cameraID, 302)
 	}
