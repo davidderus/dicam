@@ -21,6 +21,8 @@ func Start() {
 	router.HandleFunc("/", HomeIndex)
 	router.HandleFunc("/cameras", CameraIndex)
 	router.HandleFunc("/cameras/{cameraId}", CameraShow)
+	router.HandleFunc("/cameras/{cameraId}/start", CameraStart)
+	router.HandleFunc("/cameras/{cameraId}/stop", CameraStop)
 
 	http.Handle("/", router)
 
@@ -46,7 +48,7 @@ func loadConfig() *config.Config {
 }
 
 // askClient interacts once with the command center
-func askClient(command string) string {
+func askClient(command string) (string, error) {
 	config := AppConfig
 	client := &client.Client{Host: config.Host, Port: config.Port}
 	connectionError := client.Connect()
@@ -55,6 +57,7 @@ func askClient(command string) string {
 		log.Fatalln(connectionError)
 	}
 
-	askResponse, _ := client.Ask(command)
-	return askResponse
+	askResponse, askError := client.Ask(command)
+
+	return askResponse, askError
 }

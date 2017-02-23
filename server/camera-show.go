@@ -13,7 +13,7 @@ func CameraShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cameraID := vars["cameraId"]
 
-	cameraRawInfos := askClient("CAM-INFOS-" + cameraID)
+	cameraRawInfos, _ := askClient("CAM-INFOS-" + cameraID)
 	cameraInfos := map[string]string{}
 
 	cameraInfos["ID"] = cameraID

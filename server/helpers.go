@@ -24,7 +24,7 @@ type templateData struct {
 }
 
 func getCameras() map[string]*smallCamera {
-	camsRawList := askClient("CAM-LIST")
+	camsRawList, _ := askClient("CAM-LIST")
 
 	camerasList := map[string]*smallCamera{}
 

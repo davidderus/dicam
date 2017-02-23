@@ -29,9 +29,9 @@
 
     <div>
       {{ if .ViewData.PID }}
-      <a href="/cameras/{{ .ViewData.DEVICE }}/stop" class="btn btn-danger btn-block">Stop</a>
+      <a href="/cameras/{{ .ViewData.ID }}/stop" class="btn btn-danger btn-block">Stop</a>
       {{ else }}
-      <a href="/cameras/{{ .ViewData.DEVICE }}/start" class="btn btn-success btn-block">Start</a>
+      <a href="/cameras/{{ .ViewData.ID }}/start" class="btn btn-success btn-block">Start</a>
       {{ end }}
     </div>
   </div>
