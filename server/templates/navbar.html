@@ -22,7 +22,14 @@
             <li role="separator" class="divider"></li>
             {{ range $key, $camera := .LayoutData.CamerasListing }}
             <li>
-              <a href="/cameras/{{ $camera.ID }}">{{ $camera.ID }}</a>
+              <a href="/cameras/{{ $camera.ID }}">
+                {{ if $camera.Active }}
+                  <span class="text-success">&#127761;</span>
+                {{ else }}
+                  <span class="text-danger">&#127765;</span>
+                {{ end }}
+                &nbsp;{{ $camera.ID }}
+              </a>
             </li>
             {{ end }}
           </ul>
