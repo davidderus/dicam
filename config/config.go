@@ -51,6 +51,14 @@ type NotifierOptions struct {
 	ServiceOptions map[string]string `toml:"options"`
 }
 
+// WebServerOptions defines some of the webserver options
+type WebServerOptions struct {
+	Port int
+	Host string
+
+	Users map[string]string
+}
+
 // Config is the default config object
 type Config struct {
 	Port int
@@ -70,6 +78,9 @@ type Config struct {
 
 	// All cameras with a watch role will use the given Notifiers
 	Notifiers map[string]*NotifierOptions
+
+	// Defines the webserver options
+	WebServer WebServerOptions
 }
 
 // TemplatesDirectory is where the main and thread config are stored
@@ -130,6 +141,9 @@ func (c *Config) setDefaults(userDir string) {
 	c.Host = ""
 	c.MotionPath = defaultMotionPath
 	c.WorkingDir = path.Join(userDir, ".dicam")
+
+	c.WebServer.Host = ""
+	c.WebServer.Port = 8000
 }
 
 // validate validates a few config options to prevent further errors

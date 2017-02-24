@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -30,9 +31,11 @@ func Start() {
 
 	http.Handle("/", router)
 
+	webServerAddress := fmt.Sprintf("%s:%d", AppConfig.WebServer.Host, AppConfig.WebServer.Port)
+
 	server := &http.Server{
 		Handler: router,
-		Addr:    ":8000",
+		Addr:    webServerAddress,
 
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
