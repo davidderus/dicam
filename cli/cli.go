@@ -114,7 +114,7 @@ func Init(version string) {
 			Aliases: []string{"s"},
 			Usage:   "Starts the webserver",
 			Action: func(c *cli.Context) error {
-				fmt.Println("Starting webserver on port 8000")
+				fmt.Printf("Starting webserver on %s:%d\n", appConfig.WebServer.Host, appConfig.WebServer.Port)
 				server.Start()
 				return nil
 			},

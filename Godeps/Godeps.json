@@ -1,12 +1,17 @@
 {
 	"ImportPath": "github.com/davidderus/dicam",
 	"GoVersion": "go1.8",
-	"GodepVersion": "v74",
+	"GodepVersion": "v79",
 	"Deps": [
 		{
 			"ImportPath": "github.com/BurntSushi/toml",
 			"Comment": "v0.2.0-21-g9906417",
 			"Rev": "99064174e013895bbd9b025c31100bd1d9b590ca"
+		},
+		{
+			"ImportPath": "github.com/abbot/go-http-auth",
+			"Comment": "v0.3-16-gd45c47b",
+			"Rev": "d45c47bedec736d172957bd394786b76626fa8ac"
 		},
 		{
 			"ImportPath": "github.com/gorilla/mux",
@@ -21,6 +26,18 @@
 		{
 			"ImportPath": "github.com/xconstruct/go-pushbullet",
 			"Rev": "7701de4be0964342739f6626906fe3678a23c0f0"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "568507f56e5b05b3c219ffd7fba12655c07bcc86"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "568507f56e5b05b3c219ffd7fba12655c07bcc86"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "dd2d9a67c97da0afa00d5726e28086007a0acce5"
 		}
 	]
 }
