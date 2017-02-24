@@ -1,14 +1,13 @@
-# dicam 0.4.0
+# dicam 0.5.0
 
 dicam aims too allow easy management of a network of webcams for surveillance or streaming.
 
 ## Features
 
 - Motion detection
-- Push, email and sound alerts on motion
+- Push notifications or email on motion
 - Remote access and control via CLI
-- HTML Webserver for webcams streaming
-- Authentificated activation and deactivation
+- HTML interface for webcams streaming and control
 
 ## Setup
 
@@ -34,7 +33,6 @@ cmake .
 make
 
 cp motion /usr/local/bin/motion
-cp motion-dist.conf /usr/local/etc/motion/motion.conf
 ```
 
 ### 2. Download dicam
@@ -61,7 +59,14 @@ countdown = 30 # In seconds, default to 10
   [cameras.dorms]
   auto_start = false
   device = "/dev/video1"
+  input = -1 # Custom input handling
   role = "stream" # No notifications. Only streaming.
+
+[webserver]
+  # optionnal HTTP digest auth
+  [[webserver.user]]
+    name = "john"
+    password = "my_hashed_password"
 
 [notifiers]
   [notifiers.emailer]
@@ -106,11 +111,26 @@ dicam cam list
 
 #### D. Live streams
 
-TODO
+Dicam embeds a webserver which allows you to control your cameras and watch their
+streams in real time.
 
-## Other notifiers
+To start the webserver, run `dicam webserver`.
 
-### Pushbullet
+Then, you can access [0.0.0.0:8000]() and browse your cameras through the
+web interface.
+
+##### Web Interface authentication
+
+The web interface supports HTTP Digest Authentication. The dicam realm is `dicam.local`
+so use the following command to get your hashed password:
+
+```shell
+echo -n "$username:dicam.local:$password" | md5sum > .my-password
+```
+
+#### E. Add other notifiers
+
+##### Pushbullet
 
 ```toml
 [notifiers]

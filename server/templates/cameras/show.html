@@ -1,0 +1,45 @@
+{{ define "content" }}
+
+<h1>Camera {{ index .ViewData "ID" }}</h1>
+
+<div class="row">
+  <div class="col-md-8">
+    {{ if .ViewData.PID }}
+      <img src="http://localhost:{{ .ViewData.PORT }}" width="640" height="480" class="img-responsive"></img>
+    {{ else }}
+      <div class="camera--placeholder">Camera is stopped</div>
+    {{ end }}
+  </div>
+  <div class="col-md-4">
+    {{ if .ViewData.PID }}
+    <h3>Informations</h3>
+    <dl class="dl-horizontal">
+      <dt>Role</dt>
+      <dd><span class="label label-primary">{{ index .ViewData "ROLE" }}</span></dd>
+      <dt>Port</dt>
+      <dd>{{ .ViewData.PORT }}</dd>
+      <dt>PID</dt>
+      <dd>{{ .ViewData.PID }}</dd>
+      <dt>Log File</dt>
+      <dd>{{ .ViewData.LOG }}</dd>
+      <dt>Config file</dt>
+      <dd>{{ .ViewData.CONFIG }}</dd>
+    </dl>
+
+    <br>
+    {{ end }}
+
+    <h3>Commands</h3>
+
+    <div>
+      {{ if .ViewData.PID }}
+      <a href="/cameras/{{ .ViewData.ID }}/stop" class="btn btn-danger btn-block">Stop</a>
+      {{ else }}
+      <a href="/cameras/{{ .ViewData.ID }}/start" class="btn btn-success btn-block">Start</a>
+      {{ end }}
+    </div>
+  </div>
+</div>
+
+
+{{ end }}

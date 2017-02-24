@@ -27,13 +27,6 @@ type EventFile struct {
 	fileType string
 }
 
-// defaultWaitTime is the time before firing an event
-//
-// This is set in order not to immediately alert when detecting a motion and
-// letting some time for the user to deactivate the notifier (ie: when entering
-// his property)
-const defaultWaitTime = 10
-
 // SetDateTime parse the epoch time given by motion and update the Event with
 // the normalized value
 func (e *Event) SetDateTime(motionTime string) error {
@@ -79,10 +72,6 @@ func (e *Event) store() {
 // notification
 func (e *Event) startCountdown() {
 	waitTime := e.Config.Countdown
-
-	if waitTime == 0 {
-		waitTime = defaultWaitTime
-	}
 
 	log.Printf("Sending notification in %d seconds\n", waitTime)
 	time.Sleep(time.Duration(waitTime) * time.Second)

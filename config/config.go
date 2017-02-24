@@ -18,6 +18,9 @@ type CameraOptions struct {
 	// Device address like /dev/video0
 	Device string
 
+	// Custom input (default is 8)
+	Input int
+
 	// Basic Motion options
 	Width     int
 	Height    int
@@ -48,6 +51,20 @@ type NotifierOptions struct {
 	ServiceOptions map[string]string `toml:"options"`
 }
 
+type webUser struct {
+	Name     string
+	Password string
+}
+
+// WebServerOptions defines some of the webserver options
+type WebServerOptions struct {
+	Port      int
+	Host      string
+	AuthRealm string `toml:"auth_realm"`
+
+	User []webUser
+}
+
 // Config is the default config object
 type Config struct {
 	Port int
@@ -67,6 +84,9 @@ type Config struct {
 
 	// All cameras with a watch role will use the given Notifiers
 	Notifiers map[string]*NotifierOptions
+
+	// Defines the webserver options
+	WebServer WebServerOptions
 }
 
 // TemplatesDirectory is where the main and thread config are stored
@@ -78,6 +98,9 @@ const ConfigDirectoryName = "configs"
 // LogsDirectoryName is the name for the directory where the motion logs are stored
 const LogsDirectoryName = "logs"
 
+// CapturesDirectoryName is the main folder where all the pictures and videos are saved
+const CapturesDirectoryName = "captures"
+
 // MainConfigFileTemplate is the default motion config
 const MainConfigFileTemplate = "motion.conf.tpl"
 
@@ -86,6 +109,19 @@ const ThreadBaseName = "dicam-thread-%s"
 
 // DefaultConfigMode is the file mode for a config file
 const DefaultConfigMode = 0700
+
+// DefaultHost sets up the controller and webserver host as Internet-open hosts
+const DefaultHost = "0.0.0.0"
+
+// DefaultAuthRealm is the default realm used for the web server digest authentication
+const DefaultAuthRealm = "dicam.local"
+
+// DefaultWaitTime is the time before firing an event
+//
+// This is set in order not to immediately alert when detecting a motion and
+// letting some time for the user to deactivate the notifier (ie: when entering
+// his property)
+const DefaultWaitTime = 10
 
 // Read reads config for dicam
 func Read() (*Config, error) {
@@ -98,15 +134,25 @@ func Read() (*Config, error) {
 
 	configFullPath := path.Join(userHomeDir, ".config/dicam/config.toml")
 
+	// Initializing configuration
 	var config Config
 
+	// Setting defaults for required elements
+	config.setDefaults(userHomeDir)
+
+	// Parsing config file, thus overriding defaults if needed
 	_, configError := toml.DecodeFile(configFullPath, &config)
 	if configError != nil {
 		return nil, configError
 	}
 
-	config.setDefaults(userHomeDir)
+	// Validating resulting configuration
+	validationError := config.validate()
+	if validationError != nil {
+		return nil, validationError
+	}
 
+	// Setting up working directory for later use
 	populateError := config.populateWorkingDir()
 	if populateError != nil {
 		return nil, populateError
@@ -120,10 +166,15 @@ func Read() (*Config, error) {
 func (c *Config) setDefaults(userDir string) {
 	defaultMotionPath, _ := exec.LookPath("motion")
 
+	c.Countdown = DefaultWaitTime
 	c.Port = 8888
-	c.Host = ""
+	c.Host = DefaultHost
 	c.MotionPath = defaultMotionPath
 	c.WorkingDir = path.Join(userDir, ".dicam")
+
+	c.WebServer.Host = DefaultHost
+	c.WebServer.Port = 8000
+	c.WebServer.AuthRealm = DefaultAuthRealm
 }
 
 // validate validates a few config options to prevent further errors
@@ -155,6 +206,11 @@ func (c *Config) populateWorkingDir() error {
 	mkdirLogsError := os.MkdirAll(path.Join(c.WorkingDir, LogsDirectoryName), DefaultConfigMode)
 	if mkdirLogsError != nil {
 		return mkdirLogsError
+	}
+
+	mkdirCapturesError := os.MkdirAll(path.Join(c.WorkingDir, CapturesDirectoryName), DefaultConfigMode)
+	if mkdirCapturesError != nil {
+		return mkdirCapturesError
 	}
 
 	return nil

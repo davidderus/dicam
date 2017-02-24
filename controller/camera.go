@@ -17,21 +17,29 @@ import (
 // optionnal PID if it is started
 type camera struct {
 	ID           string
-	pid          int
-	configFile   string
-	logFile      string
-	workingDir   string
+	StreamPort   int
+	CapturesDir  string
 	NotifierPath string
 	UserOptions  *config.CameraOptions
+
+	pid int
+
+	workingDir string
+	configFile string
+	logFile    string
 }
 
 func (c *camera) setWorkingDir(directory string) {
 	c.workingDir = directory
 }
 
-// getNotifierPath gets the binary current path in order to launch watchers
+func (c *camera) setStreamPort(streamPort int) {
+	c.StreamPort = streamPort
+}
+
+// getNotifierPath gets the absolute path to the dicam binary in order to launch watchers
 func (c *camera) getNotifierPath() error {
-	appDir, appDirError := filepath.Abs(filepath.Dir(os.Args[0]))
+	appDir, appDirError := filepath.Abs(os.Args[0])
 	if appDirError != nil {
 		return appDirError
 	}
@@ -86,11 +94,18 @@ func (c *camera) buildConfig() error {
 	threadName := fmt.Sprintf(config.ThreadBaseName, c.ID)
 	c.configFile = path.Join(c.workingDir, config.ConfigDirectoryName, threadName+".conf")
 	c.logFile = path.Join(c.workingDir, config.LogsDirectoryName, threadName+".log")
+	c.CapturesDir = path.Join(c.workingDir, config.CapturesDirectoryName, threadName)
 
 	// Read from default template
 	template, parseError := template.ParseFiles(mainConfigPath)
 	if parseError != nil {
 		return errors.New("Can not read nor parse main config template: " + parseError.Error())
+	}
+
+	// Ensure that captures directory exists
+	mkdirCamCapturesDir := os.MkdirAll(c.CapturesDir, 0700)
+	if mkdirCamCapturesDir != nil {
+		return errors.New("Can not create captures storage directory")
 	}
 
 	// Execute config options against template
@@ -138,10 +153,24 @@ func (c *camera) stop() error {
 	return nil
 }
 
-func (c camera) isRunning() bool {
+func (c *camera) isRunning() bool {
 	return c.pid > 0
 }
 
 func (c camera) teardown() {
 	os.Remove(c.configFile)
+}
+
+func (c *camera) infos() string {
+	infosTemplate := "DEVICE:%s\nROLE:%s\nPID:%d\nPORT:%d\nLOG:%s\nCONFIG:%s"
+
+	return fmt.Sprintf(
+		infosTemplate,
+		c.ID,
+		c.UserOptions.Role,
+		c.pid,
+		c.StreamPort,
+		c.logFile,
+		c.configFile,
+	)
 }

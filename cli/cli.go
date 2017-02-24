@@ -8,16 +8,18 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/davidderus/dicam/client"
 	"github.com/davidderus/dicam/config"
 	"github.com/davidderus/dicam/controller"
 	"github.com/davidderus/dicam/notifier"
+	"github.com/davidderus/dicam/server"
 
 	"github.com/urfave/cli"
 )
 
 // getClient creates a new client to send command to the CommandCenter
-func getClient(config *config.Config) *Client {
-	client := &Client{Host: config.Host, Port: config.Port}
+func getClient(config *config.Config) *client.Client {
+	client := &client.Client{Host: config.Host, Port: config.Port}
 	connectionError := client.Connect()
 
 	if connectionError != nil {
@@ -39,7 +41,7 @@ func loadConfig() *config.Config {
 
 // Init starts Dicam command line interface
 func Init(version string) {
-	var client *Client
+	var client *client.Client
 
 	appConfig := loadConfig()
 
@@ -77,7 +79,7 @@ func Init(version string) {
 					Name:  "start",
 					Usage: "Starts a camera",
 					Action: func(c *cli.Context) error {
-						client.Ask("CAM-START-" + c.Args().First())
+						client.Print("CAM-START-" + c.Args().First())
 						return nil
 					},
 				},
@@ -85,7 +87,7 @@ func Init(version string) {
 					Name:  "stop",
 					Usage: "Stops a camera",
 					Action: func(c *cli.Context) error {
-						client.Ask("CAM-STOP-" + c.Args().First())
+						client.Print("CAM-STOP-" + c.Args().First())
 						return nil
 					},
 				},
@@ -93,7 +95,15 @@ func Init(version string) {
 					Name:  "list",
 					Usage: "Lists all available cameras",
 					Action: func(c *cli.Context) error {
-						client.Ask("CAM-LIST")
+						client.Print("CAM-LIST")
+						return nil
+					},
+				},
+				{
+					Name:   "infos",
+					Hidden: true,
+					Action: func(c *cli.Context) error {
+						client.Print("CAM-INFOS-" + c.Args().First())
 						return nil
 					},
 				},
@@ -104,7 +114,8 @@ func Init(version string) {
 			Aliases: []string{"s"},
 			Usage:   "Starts the webserver",
 			Action: func(c *cli.Context) error {
-				fmt.Println("Starting webserver")
+				fmt.Printf("Starting webserver on %s:%d\n", appConfig.WebServer.Host, appConfig.WebServer.Port)
+				server.Start()
 				return nil
 			},
 		},
