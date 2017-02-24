@@ -8,6 +8,8 @@ import (
 	"github.com/davidderus/dicam/client"
 	"github.com/davidderus/dicam/config"
 	"github.com/gorilla/mux"
+
+	auth "github.com/abbot/go-http-auth"
 )
 
 var AppConfig *config.Config
@@ -18,11 +20,13 @@ func Start() {
 
 	AppConfig = loadConfig()
 
-	router.HandleFunc("/", HomeIndex)
-	router.HandleFunc("/cameras", CameraIndex)
-	router.HandleFunc("/cameras/{cameraId}", CameraShow)
-	router.HandleFunc("/cameras/{cameraId}/start", CameraStart)
-	router.HandleFunc("/cameras/{cameraId}/stop", CameraStop)
+	authenticator := auth.NewDigestAuthenticator("dicam.local", LookForSecret)
+
+	router.HandleFunc("/", auth.JustCheck(authenticator, HomeIndex))
+	router.HandleFunc("/cameras", auth.JustCheck(authenticator, CameraIndex))
+	router.HandleFunc("/cameras/{cameraId}", auth.JustCheck(authenticator, CameraShow))
+	router.HandleFunc("/cameras/{cameraId}/start", auth.JustCheck(authenticator, CameraStart))
+	router.HandleFunc("/cameras/{cameraId}/stop", auth.JustCheck(authenticator, CameraStop))
 
 	http.Handle("/", router)
 
@@ -45,6 +49,10 @@ func loadConfig() *config.Config {
 	}
 
 	return config
+}
+
+func LookForSecret(user, realm string) string {
+	return ""
 }
 
 // askClient interacts once with the command center
