@@ -51,12 +51,17 @@ type NotifierOptions struct {
 	ServiceOptions map[string]string `toml:"options"`
 }
 
+type webUser struct {
+	Name     string
+	Password string
+}
+
 // WebServerOptions defines some of the webserver options
 type WebServerOptions struct {
 	Port int
 	Host string
 
-	Users map[string]string
+	User []webUser
 }
 
 // Config is the default config object

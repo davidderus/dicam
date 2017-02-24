@@ -54,7 +54,14 @@ func loadConfig() *config.Config {
 	return config
 }
 
+// LookForSecret returns a password hash from config for a given existing user
 func LookForSecret(user, realm string) string {
+	for _, webUser := range AppConfig.WebServer.User {
+		if webUser.Name == user {
+			return webUser.Password
+		}
+	}
+
 	return ""
 }
 
