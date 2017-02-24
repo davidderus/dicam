@@ -104,6 +104,16 @@ const ThreadBaseName = "dicam-thread-%s"
 // DefaultConfigMode is the file mode for a config file
 const DefaultConfigMode = 0700
 
+// DefaultHost sets up the controller and webserver host as Internet-open hosts
+const DefaultHost = "0.0.0.0"
+
+// DefaultWaitTime is the time before firing an event
+//
+// This is set in order not to immediately alert when detecting a motion and
+// letting some time for the user to deactivate the notifier (ie: when entering
+// his property)
+const DefaultWaitTime = 10
+
 // Read reads config for dicam
 func Read() (*Config, error) {
 	user, userError := user.Current()
@@ -147,12 +157,13 @@ func Read() (*Config, error) {
 func (c *Config) setDefaults(userDir string) {
 	defaultMotionPath, _ := exec.LookPath("motion")
 
+	c.Countdown = DefaultWaitTime
 	c.Port = 8888
-	c.Host = ""
+	c.Host = DefaultHost
 	c.MotionPath = defaultMotionPath
 	c.WorkingDir = path.Join(userDir, ".dicam")
 
-	c.WebServer.Host = ""
+	c.WebServer.Host = DefaultHost
 	c.WebServer.Port = 8000
 }
 
