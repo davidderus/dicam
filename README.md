@@ -1,14 +1,13 @@
-# dicam 0.4.0
+# dicam 0.5.0
 
 dicam aims too allow easy management of a network of webcams for surveillance or streaming.
 
 ## Features
 
 - Motion detection
-- Push, email and sound alerts on motion
+- Push notifications or email on motion
 - Remote access and control via CLI
-- HTML Webserver for webcams streaming
-- Authentificated activation and deactivation
+- HTML interface for webcams streaming and control
 
 ## Setup
 
@@ -34,7 +33,6 @@ cmake .
 make
 
 cp motion /usr/local/bin/motion
-cp motion-dist.conf /usr/local/etc/motion/motion.conf
 ```
 
 ### 2. Download dicam
