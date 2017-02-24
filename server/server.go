@@ -16,11 +16,18 @@ import (
 // AppConfig contains the whole application configuration
 var AppConfig *config.Config
 
+// Authenticator contains the digest authenticator instance if needed
+var Authenticator *auth.DigestAuth
+
 // Start starts the webserver on :8000
 func Start() {
 	router := mux.NewRouter()
 
 	AppConfig = loadConfig()
+
+	if len(AppConfig.WebServer.User) > 0 {
+		Authenticator = auth.NewDigestAuthenticator(AppConfig.WebServer.AuthRealm, lookForSecret)
+	}
 
 	router.HandleFunc("/", loadHandlerWithAuth(HomeIndex))
 	router.HandleFunc("/cameras", loadHandlerWithAuth(CameraIndex))
@@ -65,11 +72,10 @@ func lookForSecret(user, realm string) string {
 }
 
 // loadHandlerWithAuth check for any auth infos in config and use it for authentication.
-// If no auth infos are found, then no auth is set up.
 func loadHandlerWithAuth(handler http.HandlerFunc) http.HandlerFunc {
-	if len(AppConfig.WebServer.User) > 0 {
-		authenticator := auth.NewDigestAuthenticator(AppConfig.WebServer.AuthRealm, lookForSecret)
-		return auth.JustCheck(authenticator, handler)
+	// If no auth infos are found, then no auth is set up.
+	if Authenticator != nil {
+		return auth.JustCheck(Authenticator, handler)
 	}
 
 	return handler
