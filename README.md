@@ -64,6 +64,12 @@ countdown = 30 # In seconds, default to 10
   input = -1 # Custom input handling
   role = "stream" # No notifications. Only streaming.
 
+[webserver]
+  # optionnal HTTP digest auth
+  [[webserver.user]]
+    name = "john"
+    password = "my_hashed_password"
+
 [notifiers]
   [notifiers.emailer]
     service = "email"
@@ -112,8 +118,17 @@ streams in real time.
 
 To start the webserver, run `dicam webserver`.
 
-Then, you can access [127.0.0.1:8000]() and browse your cameras through the
+Then, you can access [0.0.0.0:8000]() and browse your cameras through the
 web interface.
+
+##### Web Interface authentication
+
+The web interface supports HTTP Digest Authentication. The dicam realm is `dicam.local`
+so use the following command to get your hashed password:
+
+```shell
+echo -n "$username:dicam.local:$password" | md5sum > .my-password
+```
 
 #### E. Add other notifiers
 
