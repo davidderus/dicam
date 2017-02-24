@@ -58,8 +58,9 @@ type webUser struct {
 
 // WebServerOptions defines some of the webserver options
 type WebServerOptions struct {
-	Port int
-	Host string
+	Port      int
+	Host      string
+	AuthRealm string `toml:"auth_realm"`
 
 	User []webUser
 }
@@ -111,6 +112,9 @@ const DefaultConfigMode = 0700
 
 // DefaultHost sets up the controller and webserver host as Internet-open hosts
 const DefaultHost = "0.0.0.0"
+
+// DefaultAuthRealm is the default realm used for the web server digest authentication
+const DefaultAuthRealm = "dicam.local"
 
 // DefaultWaitTime is the time before firing an event
 //
@@ -170,6 +174,7 @@ func (c *Config) setDefaults(userDir string) {
 
 	c.WebServer.Host = DefaultHost
 	c.WebServer.Port = 8000
+	c.WebServer.AuthRealm = DefaultAuthRealm
 }
 
 // validate validates a few config options to prevent further errors

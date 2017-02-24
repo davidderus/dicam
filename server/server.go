@@ -68,7 +68,7 @@ func lookForSecret(user, realm string) string {
 // If no auth infos are found, then no auth is set up.
 func loadHandlerWithAuth(handler http.HandlerFunc) http.HandlerFunc {
 	if len(AppConfig.WebServer.User) > 0 {
-		authenticator := auth.NewDigestAuthenticator("dicam.local", lookForSecret)
+		authenticator := auth.NewDigestAuthenticator(AppConfig.WebServer.AuthRealm, lookForSecret)
 		return auth.JustCheck(authenticator, handler)
 	}
 
