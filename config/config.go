@@ -115,15 +115,25 @@ func Read() (*Config, error) {
 
 	configFullPath := path.Join(userHomeDir, ".config/dicam/config.toml")
 
+	// Initializing configuration
 	var config Config
 
+	// Setting defaults for required elements
+	config.setDefaults(userHomeDir)
+
+	// Parsing config file, thus overriding defaults if needed
 	_, configError := toml.DecodeFile(configFullPath, &config)
 	if configError != nil {
 		return nil, configError
 	}
 
-	config.setDefaults(userHomeDir)
+	// Validating resulting configuration
+	validationError := config.validate()
+	if validationError != nil {
+		return nil, validationError
+	}
 
+	// Setting up working directory for later use
 	populateError := config.populateWorkingDir()
 	if populateError != nil {
 		return nil, populateError
