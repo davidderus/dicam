@@ -9,6 +9,23 @@ dicam aims too allow easy management of a network of webcams for surveillance or
 - Remote access and control via CLI
 - HTML interface for webcams streaming and control
 
+## TODO
+
+### For v1
+
+- [ ] Handle IP cameras
+- [ ] Bundle static assets in the binary
+- [ ] Update documentation with examples, explanations and screenshots
+
+### For later
+
+- [ ] External feed access
+- [ ] Config file improvements
+- [ ] Web server index and stats/logs for each cameras
+- [ ] Secure motion feed streaming
+- [ ] Add some tests
+- …
+
 ## Setup
 
 ### 1. Install motion
