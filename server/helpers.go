@@ -2,7 +2,6 @@ package server
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -14,11 +13,12 @@ type smallCamera struct {
 	Active bool
 }
 
+// LayoutData contains all data required for the persisted layout display
 type LayoutData struct {
 	CamerasListing map[string]*smallCamera
 }
 
-type templateData struct {
+type templateBindedData struct {
 	ViewData interface{}
 	LayoutData
 }
@@ -46,20 +46,28 @@ func getCameras() map[string]*smallCamera {
 	return camerasList
 }
 
-func writeWithTemplate(response http.ResponseWriter, templateName string, templatePath string, data interface{}) {
-	getTemplateDirForFile := func(file string) string {
-		return filepath.Join("server", "templates", file)
-	}
+func writeWithTemplate(response http.ResponseWriter, templateName string, templatePath string, data interface{}) error {
+	templates := template.New("")
 
-	templateFile, parseError := template.ParseFiles(
-		getTemplateDirForFile("layout.html"),
-		getTemplateDirForFile("navbar.html"),
-		getTemplateDirForFile(templatePath),
+	var (
+		templateDir  string
+		templateData []byte
+		assetError   error
 	)
 
-	if parseError != nil {
-		log.Fatalf("Can't parse template for %s", templateName)
+	templatesToRender := []string{"layout.html", "navbar.html", templatePath}
+
+	for _, templateName := range templatesToRender {
+		templateDir = filepath.Join("server", "templates", templateName)
+		templateData, assetError = Asset(templateDir)
+
+		// Skipping template on asset error
+		if assetError == nil {
+			templates.New(templateDir).Parse(string(templateData))
+		}
 	}
 
-	templateFile.ExecuteTemplate(response, "layout", templateData{data, LayoutData{CamerasListing: getCameras()}})
+	templates.ExecuteTemplate(response, "layout", templateBindedData{data, LayoutData{CamerasListing: getCameras()}})
+
+	return nil
 }

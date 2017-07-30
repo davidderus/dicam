@@ -1,5 +1,8 @@
 package server
 
+// In order to embed templates in this package, install `jteeuwen/go-bindata`
+// and use the following command: `go-bindata -o server/bindata.go -pkg server server/templates/...`
+
 import (
 	"fmt"
 	"log"
