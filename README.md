@@ -1,4 +1,4 @@
-# dicam 0.5.0
+# dicam 0.6.0
 
 dicam aims too allow easy management of a network of webcams for surveillance
 or streaming.
@@ -14,6 +14,7 @@ or streaming.
 
 ## Next steps
 
+- [ ] Multi-platform binaries on Github
 - [ ] User friendly notifications (_with images/videos if possible_)
 - [ ] External feeds access (_dicam will act as a reverse proxy_)
 - [ ] Web server index and stats/logs for each cameras
@@ -28,10 +29,11 @@ or streaming.
 
 ### 1. Download dicam
 
-dicam is available as a single binary for some platforms.
+To install the library and command line program, use the following:
 
-In order to get the last version, grab it from the latest
-[release](https://github.com/davidderus/dicam/releases).
+```shell
+go get -u github.com/davidderus/dicam/...
+```
 
 ### 2. Run it!
 
