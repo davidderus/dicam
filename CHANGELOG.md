@@ -2,4 +2,4 @@
 
 - Opening beta to the public
 - Static files embedding in go binary
-- 
+- IP cameras support (+auth)
