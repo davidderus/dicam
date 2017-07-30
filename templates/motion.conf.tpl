@@ -6,9 +6,36 @@
 # Capture device options
 ############################################################
 
+{{if eq .UserOptions.GetCameraType "local"}}
 # Videodevice to be used for capturing  (default /dev/video0)
 # for FreeBSD default is /dev/bktr0
 videodevice {{.UserOptions.Device}}
+
+{{else}}
+
+# URL to use if you are using a network camera, size will be autodetected (incl http:// ftp:// or file:///)
+# Must be a URL that returns single jpeg pictures or a raw mjpeg stream. Default: Not defined
+netcam_url {{.UserOptions.RemoteDevice}}
+
+{{with .UserOptions.RemoteDeviceAuth}}
+# Username and password for network camera (only if required). Default: not defined
+# Syntax is user:password
+netcam_userpass {{.}}
+{{end}}
+
+# The setting for keep-alive of network socket, should improve performance on compatible net cameras.
+# 1.0:         The historical implementation using HTTP/1.0, closing the socket after each http request.
+# keep_alive:  Use HTTP/1.0 requests with keep alive header to reuse the same connection.
+# 1.1:         Use HTTP/1.1 requests that support keep alive as default.
+# Default: 1.0
+; netcam_http 1.0
+
+# URL to use for a netcam proxy server, if required, e.g. "http://myproxy".
+# If a port number other than 80 is needed, use "http://myproxy:1234".
+# Default: not defined
+; netcam_proxy value
+
+{{end}}
 
 # v4l2_palette allows to choose preferable palette to be use by motion
 # to capture from those supported by your videodevice. (default: 8)
@@ -70,26 +97,6 @@ framerate {{.}}
 # Default: 0 = disabled - the capture rate is given by the camera framerate.
 # This option is used when you want to capture images at a rate lower than 2 per second.
 minimum_frame_time 0
-
-# URL to use if you are using a network camera, size will be autodetected (incl http:// ftp:// or file:///)
-# Must be a URL that returns single jpeg pictures or a raw mjpeg stream. Default: Not defined
-; netcam_url value
-
-# Username and password for network camera (only if required). Default: not defined
-# Syntax is user:password
-; netcam_userpass value
-
-# The setting for keep-alive of network socket, should improve performance on compatible net cameras.
-# 1.0:         The historical implementation using HTTP/1.0, closing the socket after each http request.
-# keep_alive:  Use HTTP/1.0 requests with keep alive header to reuse the same connection.
-# 1.1:         Use HTTP/1.1 requests that support keep alive as default.
-# Default: 1.0
-; netcam_http 1.0
-
-# URL to use for a netcam proxy server, if required, e.g. "http://myproxy".
-# If a port number other than 80 is needed, use "http://myproxy:1234".
-# Default: not defined
-; netcam_proxy value
 
 # Set less strict jpeg checks for network cameras with a poor/buggy firmware.
 # Default: off

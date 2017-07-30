@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"net/http"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+	"strings"
 	"syscall"
 
 	"github.com/davidderus/dicam/config"
@@ -56,17 +58,23 @@ func (c *camera) setup(cameraOptions *config.CameraOptions) error {
 		return errors.New("No id set for camera")
 	}
 
-	if len(cameraOptions.Device) == 0 {
-		return errors.New("No device infos set")
+	if cameraOptions.GetCameraType() == "" {
+		return errors.New("Invalid camera type. You must have one of `device` (local device address) or `remote_device` (remote camera IP)")
 	}
 
-	_, deviceStatError := os.Stat(cameraOptions.Device)
-	if deviceStatError != nil {
-		if os.IsNotExist(deviceStatError) {
-			return fmt.Errorf("Device %s not found, aborting.", cameraOptions.Device)
-		}
+	cameraType := cameraOptions.GetCameraType()
 
-		return deviceStatError
+	var pingError error
+
+	// Checking local or remote camera existence
+	if cameraType == "local" {
+		pingError = pingLocalCamera(cameraOptions.Device)
+	} else {
+		pingError = pingRemoteCamera(cameraOptions.RemoteDevice, cameraOptions.RemoteDeviceAuth)
+	}
+
+	if pingError != nil {
+		return pingError
 	}
 
 	c.UserOptions = cameraOptions
@@ -173,4 +181,45 @@ func (c *camera) infos() string {
 		c.logFile,
 		c.configFile,
 	)
+}
+
+// pingLocalCamera check the existence of the camera on the host.
+func pingLocalCamera(deviceAddress string) error {
+	_, deviceStatError := os.Stat(deviceAddress)
+	if deviceStatError != nil {
+		if os.IsNotExist(deviceStatError) {
+			return fmt.Errorf("Device %s not found, aborting", deviceAddress)
+		}
+
+		return deviceStatError
+	}
+
+	return nil
+}
+
+// pingRemoteCamera issue a GET request to the remote camera URL, but does not read the body.
+// If the server respond with a 200, then the camera is accepted.
+// We're not doing HEAD as some webcam server may return a body on HEAD resulting
+// in a `http.ErrBodyNotAllowed`
+func pingRemoteCamera(remoteAddress, remoteAuth string) error {
+	httpClient := &http.Client{}
+	httpRequest, _ := http.NewRequest("GET", remoteAddress, nil)
+
+	if remoteAuth != "" {
+		remoteAuthArray := strings.Split(remoteAuth, ":")
+		httpRequest.SetBasicAuth(remoteAuthArray[0], remoteAuthArray[1])
+	}
+
+	response, headError := httpClient.Do(httpRequest)
+	response.Body.Close()
+
+	if headError != nil {
+		return headError
+	}
+
+	if response.StatusCode != 200 {
+		return fmt.Errorf("Expecting a HTTP 200 for %s, but %d found", remoteAddress, response.StatusCode)
+	}
+
+	return nil
 }
