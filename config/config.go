@@ -16,7 +16,16 @@ import (
 // CameraOptions lists the options allowed for a camera
 type CameraOptions struct {
 	// Device address like /dev/video0
+	// Conflicts with `RemoteDevice`
 	Device string
+
+	// IP Address like 192.168.0.12.
+	// Conflicts with `Device`
+	RemoteDevice string `toml:"remote_device"`
+
+	// Remote Camera auth infos.
+	// Syntax is user:password
+	RemoteDeviceAuth string `toml:"remote_device_auth"`
 
 	// Custom input (default is 8)
 	Input int
@@ -90,7 +99,7 @@ type Config struct {
 }
 
 // TemplatesDirectory is where the main and thread config are stored
-const TemplatesDirectory = "templates"
+const TemplatesDirectory = "controller/templates"
 
 // ConfigDirectoryName is the name for the thread configs directory
 const ConfigDirectoryName = "configs"
@@ -241,4 +250,15 @@ func (c *Config) GetCameraOptions(cameraID string) (*CameraOptions, error) {
 	}
 
 	return nil, fmt.Errorf("No options available for camera %s", cameraID)
+}
+
+// GetCameraType return the camera type based on its settings
+func (camOpts *CameraOptions) GetCameraType() string {
+	if len(camOpts.Device) > 0 {
+		return "local"
+	} else if len(camOpts.RemoteDevice) > 0 {
+		return "remote"
+	} else {
+		return ""
+	}
 }
