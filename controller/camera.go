@@ -105,7 +105,12 @@ func (c *camera) buildConfig() error {
 	c.CapturesDir = path.Join(c.workingDir, config.CapturesDirectoryName, threadName)
 
 	// Read from default template
-	template, parseError := template.ParseFiles(mainConfigPath)
+	templateData, assetError := Asset(mainConfigPath)
+	if assetError != nil {
+		return errors.New("Can not read nor parse main config template: " + assetError.Error())
+	}
+
+	template, parseError := template.New("motion.conf").Parse(string(templateData))
 	if parseError != nil {
 		return errors.New("Can not read nor parse main config template: " + parseError.Error())
 	}

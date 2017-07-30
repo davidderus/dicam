@@ -99,7 +99,7 @@ type Config struct {
 }
 
 // TemplatesDirectory is where the main and thread config are stored
-const TemplatesDirectory = "templates"
+const TemplatesDirectory = "controller/templates"
 
 // ConfigDirectoryName is the name for the thread configs directory
 const ConfigDirectoryName = "configs"
