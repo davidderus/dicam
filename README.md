@@ -1,6 +1,6 @@
-# dicam 0.6.0
+# dicam 0.6.1
 
-dicam aims too allow easy management of a network of webcams for surveillance
+dicam aims to allow easy management of a network of webcams for surveillance
 or streaming.
 
 **It is currently in beta, so fell free to report any bug or missing infos.**
