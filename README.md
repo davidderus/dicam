@@ -5,6 +5,14 @@ or streaming.
 
 **It is currently in beta, so fell free to report any bug or missing infos.**
 
+## Disclaimer
+
+⚠️ This app is not maintained anymore ⚠️
+
+_Why?_ After spending some time building my own network surveillance app, I realised that reinventing the wheel is less efficient than using an existing solution and just spending time on configuration and updates.
+
+If you want to use this project, just fork it :)
+
 ## Features
 
 - Motion detection from local or remote cameras
